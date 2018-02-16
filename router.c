@@ -8,10 +8,8 @@
 
 int main(){
 
-  int sockfd = socket(AF_INET,SOCK_STREAM,0);
   fd_set sockets;
   FD_ZERO(&sockets);
-  FD_SET(sockfd,&sockets);
 
 
   int packet_socket;
@@ -86,11 +84,7 @@ int main(){
     int currentsock;
     for(i=0; i<FD_SETSIZE;i++){
       if(FD_ISSET(i,&tmp_set)){
-            if(i==sockfd){
-                currentsock  = accept(sockfd,(struct sockaddr*)&recvaddr,&recvaddrlen);
-                FD_SET(currentsock,&sockets);
-            }
-      int n = recvfrom(packet_socket, buf, 1500,0,(struct sockaddr*)&recvaddr, &recvaddrlen);
+      int n = recvfrom(i, buf, 1500,0,(struct sockaddr*)&recvaddr, &recvaddrlen);
       //ignore outgoing packets (we can't disable some from being sent
       //by the OS automatically, for example ICMP port unreachable
       //messages, so we will just ignore them here)
