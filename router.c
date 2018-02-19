@@ -98,7 +98,7 @@ int main(){
         continue;
       }
 
-      if(recvaddr.sll_pkttype == 0x0806){ // got an arp packet
+      if(recvaddr.sll_pkttype == htons(0x0806)){ // got an arp packet
         printf("got a packet in arp");
       }
 
