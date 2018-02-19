@@ -8,10 +8,10 @@
 
 int main(){
 
-  int sockfd = socket(AF_INET,SOCK_STREAM,0);
+
   fd_set sockets;
   FD_ZERO(&sockets);
-  FD_SET(sockfd,&sockets);
+
 
 
   int packet_socket;
@@ -96,9 +96,15 @@ int main(){
       //messages, so we will just ignore them here)
       if(recvaddr.sll_pkttype==PACKET_OUTGOING)
         continue;
+
+      if(recvaddr.sll_pkttype == 0x0806){ // got an arp packet
+        printf("got a packet in arp")
+      }
+
+      if(recvaddr.sll_pkttype == 0x01){ // got an icmp packet
       //start processing all others
-      printf("Got a %d byte packet\n", n);
-    
+        printf("Got a %d byte packet\n", n);
+      }
       //what else to do is up to you, you can send packets with send,
       //just like we used for TCP sockets (or you can use sendto, but it
       //is not necessary, since the headers, including all addresses,
