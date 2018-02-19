@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-
+#include <if_ether.h>
 int main(){
 
   fd_set sockets;
@@ -93,13 +93,25 @@ int main(){
         struct ether_header eh;
         memcpy(&eh,&buf[0],14);
         int type = ntohs(eh.ether_type);
+
+
         if(type == 0x0806){ // got an arp packet
           printf("got a packet in arp");
+          struct arphdr arp;
+          //memcpy(&arp,&buff[],)
+          // build the response for arp
+
+
         }
 
-        if(recvaddr.sll_pkttype == 0x01){ // got an icmp packet
+        if(type == ETHERTYPE_IP){ // got an icmp packet
           //start processing all others
-          printf("Got a %d byte packet\n", n);
+//          struct ;
+//          memcpy(&ip,&buf[0],14);
+//          int iptype = ntohs(ip.proto_type);
+//          if(iptype == 1){
+//            printf("Got a %d byte packet\n", n);
+//          }
         }
       //what else to do is up to you, you can send packets with send,
       //just like we used for TCP sockets (or you can use sendto, but it
@@ -110,6 +122,6 @@ int main(){
   //free the interface list when we don't need it anymore
   freeifaddrs(ifaddr);
   //exit
-  return 0;
 }
+return 0;
 }
