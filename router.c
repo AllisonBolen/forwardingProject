@@ -6,6 +6,17 @@
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <if_ether.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
+#include <net/ethernet.h>
+#include <netinet/ether.h>
+#include <netinet/ip.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+//Allison Bolen, Cade Baker, Andy Hung
 int main(){
 
   fd_set sockets;
