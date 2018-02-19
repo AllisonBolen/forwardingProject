@@ -92,7 +92,7 @@ int main(){
       }
 
       if(recvaddr.sll_pkttype == 0x0806){ // got an arp packet
-        printf("got a packet in arp")
+        printf("got a packet in arp");
       }
 
       if(recvaddr.sll_pkttype == 0x01){ // got an icmp packet
