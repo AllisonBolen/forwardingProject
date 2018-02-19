@@ -133,6 +133,7 @@ int main(){
   //free the interface list when we don't need it anymore
   freeifaddrs(ifaddr);
   //exit
+  return 0;
 }
-return 0;
+
 }
