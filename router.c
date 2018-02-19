@@ -90,8 +90,8 @@ int main(){
       if(recvaddr.sll_pkttype==PACKET_OUTGOING){
         continue;
       }
-
-      if(recvaddr.sll_pkttype == htons(0x0806)){ // got an arp packet
+      int type = ntohs(eh.ether_type);
+      if(type == 0x0806){ // got an arp packet
         printf("got a packet in arp");
       }
 
