@@ -87,8 +87,9 @@ int main(){
       //ignore outgoing packets (we can't disable some from being sent
       //by the OS automatically, for example ICMP port unreachable
       //messages, so we will just ignore them here)
-      if(recvaddr.sll_pkttype==PACKET_OUTGOING)
+      if(recvaddr.sll_pkttype==PACKET_OUTGOING){
         continue;
+      }
 
       if(recvaddr.sll_pkttype == 0x0806){ // got an arp packet
         printf("got a packet in arp")
