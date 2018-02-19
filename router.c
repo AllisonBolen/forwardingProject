@@ -87,18 +87,20 @@ int main(){
       //ignore outgoing packets (we can't disable some from being sent
       //by the OS automatically, for example ICMP port unreachable
       //messages, so we will just ignore them here)
-      if(recvaddr.sll_pkttype==PACKET_OUTGOING){
-        continue;
-      }
-      int type = ntohs(eh.ether_type);
-      if(type == 0x0806){ // got an arp packet
-        printf("got a packet in arp");
-      }
+        if(recvaddr.sll_pkttype==PACKET_OUTGOING){
+          continue;
+        }
+        struct ether_header eh;
+        memcpy(&eh,&buf[0],14);
+        int type = ntohs(eh.ether_type);
+        if(type == 0x0806){ // got an arp packet
+          printf("got a packet in arp");
+        }
 
-      if(recvaddr.sll_pkttype == 0x01){ // got an icmp packet
-      //start processing all others
-        printf("Got a %d byte packet\n", n);
-      }
+        if(recvaddr.sll_pkttype == 0x01){ // got an icmp packet
+          //start processing all others
+          printf("Got a %d byte packet\n", n);
+        }
       //what else to do is up to you, you can send packets with send,
       //just like we used for TCP sockets (or you can use sendto, but it
       //is not necessary, since the headers, including all addresses,
