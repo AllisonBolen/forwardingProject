@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-
+//Allison Bolen, Cade Baker, Andy Hung
 int main(){
 
   fd_set sockets;
