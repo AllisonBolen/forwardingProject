@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-#include <if_ether.h>
+//#include <if_ether.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <netinet/ether.h>
@@ -69,11 +69,11 @@ int main(){
         struct sockaddr_ll *addrLL;
         addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
         printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
-        interfaces[count].MAC[0]=((struct ether_addr*)(addrLL->sll_addr));
+        interfaces[count].MAC = ((struct ether_addr*)(addrLL->sll_addr[6]));
         interfaces[count].name = tmp->ifa_name;
-        interfaces[count].IP[0] = tmp->ifa_addr;
-
+        interfaces[count].IP = tmp->ifa_addr[4];
         count++;
+
      	//Bind the socket to the address, so we only get packets
 	//recieved on this specific interface. For packet sockets, the
 	//address structure is a struct sockaddr_ll (see the man page
