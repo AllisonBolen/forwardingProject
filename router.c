@@ -91,7 +91,7 @@ int main(){
     //for an intertor see if we have stuff to read that if from the lab and recive the packets theu are on 
     //teh same sockect jsut parse tha packets
     int i; 
-    int currentsock;
+
     for(i=0; i<FD_SETSIZE;i++){
       if(FD_ISSET(i,&tmp_set)){
       int n = recvfrom(i, buf, 1500,0,(struct sockaddr*)&recvaddr, &recvaddrlen);
@@ -108,21 +108,31 @@ int main(){
 
         if(type == 0x0806){ // got an arp packet
           printf("got a packet in arp\n");
-          struct arphdr arp;
-          //memcpy(&arp,&buff[],)
-          // build the response for arp
+          //build the response for arp
+          // buff = packet
+          (struct sockaddr_ll *) ifaddr;
+
+//          struct ether_header ethHdr;
+//          //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
+//          struct ether_arp arpReq, arpResp;
+
+
+
+
+
+
           printf("Got a %d byte packet\n", n);
 
         }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
           //start processing all others
-//          struct ;
-//          memcpy(&ip,&buf[0],14);
-//          int iptype = ntohs(ip.proto_type);
-//          if(iptype == 1){
-//            printf("Got a %d byte packet\n", n);
-//          }
+          //need
+//           struct iphdr ipHdr;
+//           struct iphdr temIp;
+//           struct ether_header ethHdr;
+//           struct ether_header temEth;
+//           struct icmphdr *icmpHdr = malloc(sizeof(struct icmpHdr));
         }
       //what else to do is up to you, you can send packets with send,
       //just like we used for TCP sockets (or you can use sendto, but it
