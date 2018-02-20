@@ -73,7 +73,7 @@ int main(){
         memcpy(&interfaces[count].MAC,&((struct socket_ll*) tmp->ifa_addr)->sll_addr,6);
         interfaces[count].name = tmp->ifa_name;
         //interfaces[count].IP = (struct sockaddr_ll*)(tmp->ifa_addr).sll_addr;
-        memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.sll_addr,4);
+        memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
         count++;
 
      	//Bind the socket to the address, so we only get packets
