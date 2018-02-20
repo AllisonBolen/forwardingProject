@@ -84,8 +84,10 @@ int main(){
 	if(bind(packet_socket,tmp->ifa_addr,sizeof(struct sockaddr_ll))==-1){
 	  perror("bind");
 	}
+	count++;
       }
-    } else if(tmp->ifa_addr->sa_family==AF_INET){
+    }if(tmp->ifa_addr->sa_family==AF_INET){
+        count=0;
        if(!strncmp(&(tmp->ifa_name[3]),"eth",3)){
          memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
          printf("name of ip one : %s\n ", interfaces[count].name);
