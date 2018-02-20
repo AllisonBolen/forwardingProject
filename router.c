@@ -131,9 +131,9 @@ int main(){
     }
   }
   //free the interface list when we don't need it anymore
-
-}
-freeifaddrs(ifaddr);
+  freeifaddrs(ifaddr);
   //exit
   return 0;
+}
+
 }
