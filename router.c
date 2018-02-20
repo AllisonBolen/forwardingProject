@@ -113,7 +113,7 @@ int main(){
           struct ether_arp arpReq, arpResp;
           // buff = packet
           //switch teh source and dst fr send back an arp in the the ethernet header
-          memcpy(arpReq, &buf[sizeof(struct ether_header)], 18);
+          memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
           //mymac = //may be try casting to a sockaddr_ll
           //for()
           //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
