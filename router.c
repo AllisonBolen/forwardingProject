@@ -14,11 +14,7 @@
 #include <arpa/inet.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
-struct interface {
-      char* name;
-      uint8_t MAC[6];
-      uint8_t IP[4];
-};
+
 
 int main(){
 
@@ -38,6 +34,11 @@ int main(){
     perror("getifaddrs");
     return 1;
   }
+  struct interface {
+        char* name;
+        uint8_t MAC[6];
+        uint8_t IP[4];
+  };
   struct interface interfaces[20];
 
   //  fd_set tmp_set = sockets;
@@ -70,7 +71,7 @@ int main(){
         addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
         printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
         interfaces[count].MAC = ((struct ether_addr*)(addrLL->sll_addr));
-        interfaces[count].name = tmp->ifa_name;
+        interfaces[count].name = (struct sockaddr_ll*)(tmp->ifa_name);
         interfaces[count].IP = tmp->ifa_addr;
         count++;
 
