@@ -14,11 +14,11 @@
 #include <arpa/inet.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
-struct interfaces intFace{
+struct interfaces {
       char* name;
       uint8_t MAC[6];
       uint8_t IP[4];
-}
+};
 
 int main(){
 
