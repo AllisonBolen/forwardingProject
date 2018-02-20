@@ -90,9 +90,9 @@ int main(){
         count=0;
        if(!strncmp(&(tmp->ifa_name[3]),"eth",3)){
          memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
-         printf("name of ip one : %s\n ", interfaces[count].name);
-         printf("name of ip one : %s\n ", tmp->ifa_name);
-
+         printf("name of ip struct : %s\n ", interfaces[count].name);
+         printf("name of ip tmp : %s\n ", tmp->ifa_name);
+         printf("%d\n", count);
 
          count++;
        }
