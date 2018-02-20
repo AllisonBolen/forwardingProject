@@ -72,10 +72,9 @@ int main(){
         printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
         memcpy(&interfaces[count].MAC,&((struct sockaddr_ll*)tmp->ifa_addr)->sll_addr,6);
         interfaces[count].name = tmp->ifa_name;
-        //interfaces[count].IP = (struct sockaddr_ll*)(tmp->ifa_addr).sll_addr;
         memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
         count++;
-
+        printf("MAC in Interface struct: %s", (char *) interFaces[count].MAC );
      	//Bind the socket to the address, so we only get packets
 	//recieved on this specific interface. For packet sockets, the
 	//address structure is a struct sockaddr_ll (see the man page
@@ -153,10 +152,12 @@ int main(){
           memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
           memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
 
-          send(i, buf, 42, 0);// send the arp 
+          send(i, buf, 42, 0);// send the arp
         }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
+
+
           //start processing all others
           //need
 //           struct iphdr ipHdr;
