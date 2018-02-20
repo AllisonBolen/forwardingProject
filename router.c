@@ -129,6 +129,7 @@ int main(){
           continue;
         }
         struct ether_header eh;
+        //ether header for any packet
         memcpy(&eh,&buf[0],14);
         int type = ntohs(eh.ether_type);
 
@@ -138,7 +139,7 @@ int main(){
           struct ether_header ethHdrResp;
           struct ether_arp arpReq, arpResp;
 
-          memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
+          memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));// get the arp info into a header struct
           memcpy(&arpResp.arp_tha, &arpReq.arp_sha, 6); // put the source into teh new packets dst
           int j;
           u_char wantedIp[4];
@@ -158,9 +159,9 @@ int main(){
           // change ehternet header
 
           memcpy(&ethHdrResp.ether_shost, &arpResp.arp_sha, 6);// get mac of me to them
-          memcpy(&ethHdrResp.ether_dhost, &eh.ether_shost, 6);
+          memcpy(&ethHdrResp.ether_dhost, &eh.ether_shost, 6);//
           ethHdrResp.ether_type = eh.ether_type;
-
+            // fill the buffer
           memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
           memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
 
@@ -168,20 +169,45 @@ int main(){
         }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
+            struct iphdr ipReq;
+            struct iphdr ipResp;
+            //struct ether_header ethHdr;
+            struct ether_header ethResp;
+            memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
+            if(ntohs(ipReq.protocol) == 1){
+                struct icmphdr icmpReq;
+                struct icmphdr icmpResp;
+                memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
+                //swap ethernet header info
+                memcpy(&ethResp.ether_shost,&eh.ether_dhost,6);
+                memcpy(&ethResp.ether_dhost, &eh.ether_shost,6);
+                ethResp.ether_type = eh.ether_type;
+                // swap the ip header info
+                memcpy(&ipResp.saddr, &ipReq.daddr, 4);
+                memcpy(&ipResp.daddr, &ipReq.saddr, 4);
+                ipResp.tos = ipReq.tos; //copy inof over
+                ipResp.tot_len = ipReq.tot_len;
+                ipResp.id = ipReq.id;
+                ipResp.frag_off = ipReq.frag_off;
+                ipResp.ttl = ipReq.ttl;
+                ipResp.protocol = ipReq.protocol;
+                ipResp.check = ipReq.check;
+                // swap icmp stuff now
+                icmpResp.code = hston(0);// set it to echo reply
+                icmpResp.type = icmpReq.type;
+                icmpResp.checksum = icmpReq.checksum;
+                icmpResp.un.echo.id = icmpReq.un.echo.id;
+                icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
 
+                //fill the buffer again
+                memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
+                memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
+                memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
 
-          //start processing all others
-          //need
-//           struct iphdr ipHdr;
-//           struct iphdr temIp;
-//           struct ether_header ethHdr;
-//           struct ether_header temEth;
-//           struct icmphdr *icmpHdr = malloc(sizeof(struct icmpHdr));
+                send(i,buf, sizeof(buf), 0);
+            }
+             // i.un.echo. id gets you the thing out of the icmp union
         }
-      //what else to do is up to you, you can send packets with send,
-      //just like we used for TCP sockets (or you can use sendto, but it
-      //is not necessary, since the headers, including all addresses,
-      //need to be in the buffer you are sending)
     }
   }
   //free the interface list when we don't need it anymore
