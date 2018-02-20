@@ -44,6 +44,7 @@ int main(){
   //  fd_set tmp_set = sockets;
   //have the list, loop over the list
   int count =0;
+  int count2 = 0;
   for(tmp = ifaddr; tmp!=NULL; tmp=tmp->ifa_next){
     //Check if this is a packet address, there will be one per
     //interface.  There are IPv4 and IPv6 as well, but we don't care
@@ -87,14 +88,13 @@ int main(){
 	count++;
       }
     }if(tmp->ifa_addr->sa_family==AF_INET){
-        count=0;
        if(!strncmp(&(tmp->ifa_name[3]),"eth",3)){
-         memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
-         printf("name of ip struct : %s\n ", interfaces[count].name);
+         memcpy(&interfaces[count2].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
+         printf("name of ip struct : %s\n ", interfaces[count2].name);
          printf("name of ip tmp : %s\n ", tmp->ifa_name);
-         printf("%d\n", count);
+         printf("%d\n", count2);
 
-         count++;
+         count2++;
        }
     }
 
