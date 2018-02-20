@@ -142,7 +142,7 @@ int main(){
             }
           }
           memcpy(&arpResp.arp_tpa, &arpReq.arp_spa, 4);
-          mmcpy(&arpResp.arp_spa, &arpReq.arp_tpa, 4); //switch ips
+          memcpy(&arpResp.arp_spa, &arpReq.arp_tpa, 4); //switch ips
 
           printf("Got a %d byte packet\n", n);
         }
