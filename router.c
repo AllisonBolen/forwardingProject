@@ -70,7 +70,7 @@ int main(){
         struct sockaddr_ll *addrLL;
         addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
         printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
-        memcpy(interfaces[count].MAC,&((struct sockaddr_ll*)tmp->ifa_addr)->sll_addr,6);
+        memcpy(interfaces[count].MAC,addrLL->sll_addr,6);
         interfaces[count].name = tmp->ifa_name;
         memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
         count++;
