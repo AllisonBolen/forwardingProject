@@ -14,7 +14,7 @@
 #include <arpa/inet.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
-struct interfaces {
+struct interface {
       char* name;
       uint8_t MAC[6];
       uint8_t IP[4];
@@ -38,8 +38,11 @@ int main(){
     perror("getifaddrs");
     return 1;
   }
+  struct interface interfaces[20];
+
   //  fd_set tmp_set = sockets;
   //have the list, loop over the list
+  int count =0;
   for(tmp = ifaddr; tmp!=NULL; tmp=tmp->ifa_next){
     //Check if this is a packet address, there will be one per
     //interface.  There are IPv4 and IPv6 as well, but we don't care
@@ -66,6 +69,11 @@ int main(){
         struct sockaddr_ll *addrLL;
         addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
         printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
+        interfaces[count].MAC=((struct ether_addr*)(addrLL->sll_addr));
+        interfaces[count].name = ifa_name;
+        interfaces[count].IP = ifa_addr;
+
+        count++;
      	//Bind the socket to the address, so we only get packets
 	//recieved on this specific interface. For packet sockets, the
 	//address structure is a struct sockaddr_ll (see the man page
