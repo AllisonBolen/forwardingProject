@@ -74,7 +74,7 @@ int main(){
         interfaces[count].name = tmp->ifa_name;
         memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
         count++;
-        printf("MAC in Interface struct: %s", (char *) interfaces[count].MAC );
+        printf("MAC in Interface struct: %s", (char *) &interfaces[count].MAC );
      	//Bind the socket to the address, so we only get packets
 	//recieved on this specific interface. For packet sockets, the
 	//address structure is a struct sockaddr_ll (see the man page
