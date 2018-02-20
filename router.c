@@ -14,6 +14,11 @@
 #include <arpa/inet.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
+struct interfaces intFace{
+      char* name;
+      uint8_t MAC[6];
+      uint8_t IP[4];
+}
 
 int main(){
 
@@ -113,10 +118,11 @@ int main(){
           struct ether_arp arpReq, arpResp;
           // buff = packet
           //switch teh source and dst fr send back an arp in the the ethernet header
-          memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
           //mymac = //may be try casting to a sockaddr_ll
-          //for()
-          //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
+                    //for()
+                    //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
+          memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
+
 
           printf("Got a %d byte packet\n", n);
         }
