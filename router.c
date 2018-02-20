@@ -119,7 +119,9 @@ int main(){
           //mymac = //may be try casting to a sockaddr_ll
           //for()
           //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
-
+          struct sockaddr_ll *addrLL;
+          addrLL = (struct sockaddr_ll *)(i->ifa_addr);
+          printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
           printf("Got a %d byte packet\n", n);
 
         }
