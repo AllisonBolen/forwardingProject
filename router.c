@@ -124,13 +124,9 @@ int main(){
         if(type == 0x0806){ // got an arp packet
           printf("got a packet in arp\n");
           //build the response for arp
-          struct ether_header ethHdr;
+          struct ether_header ethHdrResp;
           struct ether_arp arpReq, arpResp;
-          // buff = packet
-          //switch teh source and dst fr send back an arp in the the ethernet header
-          //mymac = //may be try casting to a sockaddr_ll
-                    //for()
-                    //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
+
           memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
           memcpy(&arpResp.arp_tha, &arpReq.arp_sha, 6); // put the source into teh new packets dst
           int j;
@@ -141,10 +137,23 @@ int main(){
                 memcpy(&arpResp.arp_sha, &interfaces[j].MAC, 6); // get mmy mac and make the new source
             }
           }
-          memcpy(&arpResp.arp_tpa, &arpReq.arp_spa, 4);
+          memcpy(&arpResp.arp_tpa, &arpReq.arp_spa, 4);  // switch ips
           memcpy(&arpResp.arp_spa, &arpReq.arp_tpa, 4); //switch ips
+          arpResp.ea_hdr.ar_op = htons(2); // change op code for reply
+          arpResp.ea_hdr.ar_pro = arpReq.ea_hdr.ar_pro;
+          arpResp.ea_hdr.ar_hln = arpReq.ea_hdr.ar_hln;
+          arpResp.ea_hdr.ar_pln = arpReq.ea_hdr.ar_pln;
+          arpResp.ea_hdr.ar_hrd = arpReq.ea_hdr.ar_hrd;
+          // change ehternet header
 
-          printf("Got a %d byte packet\n", n);
+          memcpy(&ethHdrResp.ether_shost, &arpResp.arp_sha, 6);// get mac of me to them
+          memcpy(&ethHdrResp.ether_dhost, &eh.ether_shost, 6);
+          ethHdrResp.ether_type = eh.ether_type;
+
+          memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
+          memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
+
+          send(i, buf, 42, 0);// send the arp 
         }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
