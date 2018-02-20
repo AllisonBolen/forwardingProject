@@ -60,6 +60,9 @@ int main(){
 	  return 2;
 	}
         FD_SET(packet_socket, &sockets);
+        struct sockaddr_ll *addrLL;
+        addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
+        printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
      	//Bind the socket to the address, so we only get packets
 	//recieved on this specific interface. For packet sockets, the
 	//address structure is a struct sockaddr_ll (see the man page
@@ -105,22 +108,17 @@ int main(){
         memcpy(&eh,&buf[0],14);
         int type = ntohs(eh.ether_type);
 
-
         if(type == 0x0806){ // got an arp packet
           printf("got a packet in arp\n");
           //build the response for arp
+          struct ether_header ethHdr;
+          struct ether_arp arpReq, arpResp;
           // buff = packet
-          (struct sockaddr_ll *) ifaddr;
-          ifaddr.sll_addr[6]
-
-//          struct ether_header ethHdr;
-//          //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
-//          struct ether_arp arpReq, arpResp;
-
-
-
-
-
+          //switch teh source and dst fr send back an arp in the the ethernet header
+          memcpy(arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
+          //mymac = //may be try casting to a sockaddr_ll
+          //for()
+          //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
 
           printf("Got a %d byte packet\n", n);
 
