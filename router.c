@@ -69,9 +69,9 @@ int main(){
         struct sockaddr_ll *addrLL;
         addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
         printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
-        interfaces[count].MAC = ((struct ether_addr*)(addrLL->sll_addr[6]));
+        interfaces[count].MAC = ((struct ether_addr*)(addrLL->sll_addr));
         interfaces[count].name = tmp->ifa_name;
-        interfaces[count].IP = tmp->ifa_addr[4];
+        interfaces[count].IP = tmp->ifa_addr;
         count++;
 
      	//Bind the socket to the address, so we only get packets
