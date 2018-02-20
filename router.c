@@ -107,11 +107,11 @@ int main(){
 
 
         if(type == 0x0806){ // got an arp packet
-          printf("got a packet in arp");
+          printf("got a packet in arp\n");
           struct arphdr arp;
           //memcpy(&arp,&buff[],)
           // build the response for arp
-
+          printf("Got a %d byte packet\n", n);
 
         }
 
