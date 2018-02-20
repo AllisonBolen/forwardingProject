@@ -132,7 +132,17 @@ int main(){
                     //for()
                     //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
           memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
-
+          memcpy(&arpResp.arp_tha, &arpReq.arp_sha, 6); // put the source into teh new packets dst
+          int j;
+          u_char wantedIp[4];
+          memcpy(&wantedIp[0],arpReq.arp_tpa,4);
+          for(j = 0; j< 20; j++){
+            if(memcmp(interfaces[j].IP, wantedIp, 4) == 0){
+                memcpy(&arpResp.arp_sha, &interfaces[j].MAC, 6); // get mmy mac and make the new source
+            }
+          }
+          memcpy(&arpResp.arp_tpa, &arpReq.arp_spa, 4);
+          mmcpy(&arpResp.arp_spa, &arpReq.arp_tpa, 4); //switch ips
 
           printf("Got a %d byte packet\n", n);
         }
