@@ -111,6 +111,7 @@ int main(){
           //build the response for arp
           // buff = packet
           (struct sockaddr_ll *) ifaddr;
+          ifaddr.sll_addr[6]
 
 //          struct ether_header ethHdr;
 //          //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
