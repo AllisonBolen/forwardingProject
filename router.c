@@ -73,8 +73,8 @@ int main(){
         memcpy(interfaces[count].MAC,addrLL->sll_addr,6);
         //interfaces[count].name = tmp->ifa_name;
         //memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
-        count++;
         printf("\nMAC in Interface STRUCT: %s\n", ether_ntoa( (struct ether_addr*) interfaces[count].MAC ));
+        count++;
      	//Bind the socket to the address, so we only get packets
 	//recieved on this specific interface. For packet sockets, the
 	//address structure is a struct sockaddr_ll (see the man page
