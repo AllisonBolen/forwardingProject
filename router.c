@@ -71,10 +71,10 @@ int main(){
         addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
         printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
         memcpy(interfaces[count].MAC,addrLL->sll_addr,6);
-        //interfaces[count].name = tmp->ifa_name;
-        //memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
+        interfaces[count].name = tmp->ifa_name;
+        memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
         printf("\nMAC in Interface STRUCT: %s\n", ether_ntoa( (struct ether_addr*) interfaces[count].MAC ));
-        count++;
+
      	//Bind the socket to the address, so we only get packets
 	//recieved on this specific interface. For packet sockets, the
 	//address structure is a struct sockaddr_ll (see the man page
@@ -85,7 +85,17 @@ int main(){
 	  perror("bind");
 	}
       }
+    } else if(tmp->ifa_addr->sa_family==AF_INET){
+       if(!strncmp(&(tmp->ifa_name[3]),"eth",3)){
+         memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
+         printf("name of ip one : %s\n ", interfaces[count].name);
+         printf("name of ip one : %s\n ", tmp->ifa_name);
+
+
+         count++;
+       }
     }
+
   }
   //loop and recieve packets. We are only looking at one interface,
   //for the project you will probably want to look at more (to do so,
