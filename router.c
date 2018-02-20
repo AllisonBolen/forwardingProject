@@ -6,17 +6,15 @@
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <if_ether.h>
-
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <stdio.h>
 #include <string.h>
-#include <net/ethernet.h>
 #include <netinet/ether.h>
 #include <netinet/ip.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 //Allison Bolen, Cade Baker, Andy Hung
+
+
 int main(){
 
   fd_set sockets;
@@ -115,15 +113,12 @@ int main(){
           struct ether_arp arpReq, arpResp;
           // buff = packet
           //switch teh source and dst fr send back an arp in the the ethernet header
-          memcpy(arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
+          memcpy(arpReq, &buf[sizeof(struct ether_header)], 18);
           //mymac = //may be try casting to a sockaddr_ll
           //for()
           //struct sockaddr_ll *addrLL = (struct sockaddr_ll *) address;
-          struct sockaddr_ll *addrLL;
-          addrLL = (struct sockaddr_ll *)(i->ifa_addr);
-          printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
-          printf("Got a %d byte packet\n", n);
 
+          printf("Got a %d byte packet\n", n);
         }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
