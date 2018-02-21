@@ -1,16 +1,16 @@
-#include < sys / socket.h >
-#include < netpacket / packet.h >
-#include < net / ethernet.h >
-#include < stdio.h >
-#include < errno.h >
-#include < sys / types.h >
-#include < ifaddrs.h >
-#include < netinet / in .h >
-#include < string.h >
-#include < netinet / ether.h >
-#include < netinet / ip.h >
-#include < arpa / inet.h >
-#include < netinet / ip_icmp.h >
+#include <sys/socket.h>
+#include <netpacket/packet.h>
+#include <net/ethernet.h>
+#include <stdio.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <netinet/ether.h>
+#include <netinet/ip.h>
+#include <arpa/inet.h>
+#include <netinet/ip_icmp.h>
 // allison bolen, Andy Hung, Cade Baker
   int main() {
 
