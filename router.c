@@ -2,6 +2,7 @@
 #include <netpacket/packet.h>
 #include <net/ethernet.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
