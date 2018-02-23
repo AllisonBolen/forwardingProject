@@ -18,8 +18,8 @@ struct interface {
       char* name;
       uint8_t MAC[6];
       uint8_t IP[4];
-      char prefix[11];
-      uint8_t otherRouterIP[8];
+      char prefix;
+      uint8_t otherRouterIP;
 };
 
 
