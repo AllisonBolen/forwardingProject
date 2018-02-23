@@ -249,7 +249,7 @@ int main(){
           printf("here9");
 
           u_long actualIPaddr2 = inet_addr(ipaddr2);
-          uint8_t realIPaddr = (uint8_t *) actualIPaddr2;
+          uint8_t realIPaddr = (uint8_t ) actualIPaddr2;
           inter->otherRouterIP = realIPaddr;
         }
       }
