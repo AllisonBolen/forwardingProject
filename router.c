@@ -13,6 +13,14 @@
 #include <netinet/ip_icmp.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
+struct interface {
+      char* name;
+      uint8_t MAC[6];
+      uint8_t IP[4];
+      char prefix[11];
+      uint8_t otherRouterIP[8];
+};
+
 int main(){
   fd_set sockets;
   FD_ZERO(&sockets);
@@ -25,13 +33,13 @@ int main(){
     return 1;
   }
 
-  struct interface {
-        char* name;
-        uint8_t MAC[6];
-        uint8_t IP[4];
-        char prefix[11];
-        uint8_t otherRouterIP[8];
-  };
+  // struct interface {
+  //       char* name;
+  //       uint8_t MAC[6];
+  //       uint8_t IP[4];
+  //       char prefix[11];
+  //       uint8_t otherRouterIP[8];
+  // };
 
   struct interface interfaces[7];
   //  fd_set tmp_set = sockets;
