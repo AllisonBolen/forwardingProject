@@ -67,7 +67,7 @@ int main(){
         memcpy(interfaces[count].MAC,addrLL->sll_addr,6);
         interfaces[count].name = tmp->ifa_name;
         memcpy(&interfaces[count].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
-        printf("\nMAC in Interface STRUCT: %s\n", ether_ntoa( (struct ether_addr*) interfaces[count].MAC ));
+        // printf("\nMAC in Interface STRUCT: %s\n", ether_ntoa( (struct ether_addr*) interfaces[count].MAC ));
 	      if(bind(packet_socket,tmp->ifa_addr,sizeof(struct sockaddr_ll))==-1){
 	        perror("bind");
         }
@@ -87,6 +87,8 @@ int main(){
   for(j = 0; j < sizeof(interfaces); j++){
     printf("\nhere1\n");
     printf("\n interface: %s\n", interfaces[j].name);
+    //printf("\n interface: %d\n", interfaces[j].IP);
+    printf("\n interface: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC);
     readFiles((&interfaces)[j]);
   }
 
