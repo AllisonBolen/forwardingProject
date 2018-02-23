@@ -21,6 +21,8 @@ struct interface {
       uint8_t otherRouterIP[8];
 };
 
+
+void readFiles(struct interface *inter);
 int main(){
   fd_set sockets;
   FD_ZERO(&sockets);
@@ -86,7 +88,7 @@ int main(){
 
   for(j = 0; j < sizeof(interfaces); j++){
     printf("here1");
-    readFiles(&interfaces[j]);
+    readFiles(&(interfaces)[j]);
   }
 
   printf("Ready to recieve now\n");
