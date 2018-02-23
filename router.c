@@ -157,7 +157,7 @@ int main(){
                 memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
                 memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
                 memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
-                send(i,buf, sizeof(buf), 0);
+                send(i,buf, 98, 0);
 		            printf("%s\n", "Sending ICMP Response");
             }
              // i.un.echo. id gets you the thing out of the icmp union
