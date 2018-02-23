@@ -207,12 +207,12 @@ int main(){
         fscanf(fptr, "%s %s %s", pref, ipaddr, name);
         if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") == 0){
           printf("here4");
-
+          printf("\ndata: %s %s %s \n",pref, ipaddr, name);
           inter->prefix = pref[10];
         }// got the other roouter spot address
         if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") != 0){
           printf("here5");
-
+          printf("\ndata: %s %s %s \n",pref, ipaddr, name);
           u_long actualIPaddr = inet_addr(ipaddr);
           uint8_t realIPaddr= (uint8_t)actualIPaddr;
           inter->otherRouterIP = realIPaddr;
@@ -239,12 +239,12 @@ int main(){
         fscanf(fptr2, "%s %s %s", pref2, ipaddr2, name2);
         if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") == 0){
           printf("here8");
-
+          printf("\ndata %s %s %s \n", pref2, ipaddr2, name2 );
           inter->prefix = pref2[10];
         }// got the other roouter spot address
         if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") != 0){
           printf("here9");
-
+          printf("\ndata %s %s %s \n", pref2, ipaddr2, name2 );
           u_long actualIPaddr2 = inet_addr(ipaddr2);
           uint8_t realIPaddr = (uint8_t ) actualIPaddr2;
           inter->otherRouterIP = realIPaddr;
