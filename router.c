@@ -211,14 +211,14 @@ int main(){
         if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") == 0){
           printf("here4");
 
-          inter.prefix = pref;
+          inter->prefix = pref;
         }// got the other roouter spot address
         if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") != 0){
           printf("here5");
 
           u_long actualIPaddr = inet_addr(ipaddr);
           uint8_t realIPaddr= (uint8_t)actualIPaddr;
-          inter.otherRouterIP = realIPaddr;
+          inter->otherRouterIP = realIPaddr;
         }
       }
     }
@@ -243,14 +243,14 @@ int main(){
         if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") == 0){
           printf("here8");
 
-          inter.prefix = pref2;
+          inter->prefix = pref2;
         }// got the other roouter spot address
         if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") != 0){
           printf("here9");
 
           u_long actualIPaddr2 = inet_addr(ipaddr2);
           uint8_t realIPaddr = (uint8_t *) actualIPaddr2;
-          inter.otherRouterIP = actualIPaddr2;
+          inter->otherRouterIP = actualIPaddr2;
         }
       }
     }
