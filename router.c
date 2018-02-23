@@ -180,7 +180,7 @@ int main(){
     return 0;
   }
 
-  void readFiles(struct interface *interface){
+  void readFiles(struct interface *inter){
     printf("here2");
 
     char* filename[20] = "r1-table.txt"
@@ -197,17 +197,17 @@ int main(){
       for(a = 0; a < 3; a++){
         char pref[10], ipaddr[10], name[10];
         fscanf(fptr, "%s %s %s", pref, ippaddr, name);
-        if(strcmp(name, interface->name) == 0 && strcmp(ipaddr, "-") == 0){
+        if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") == 0){
           printf("here4");
 
-          interface.prefix = pref;
+          inter.prefix = pref;
         }// got the other roouter spot address
-        if(strcmp(name, interface->name) == 0 && strcmp(ipaddr, "-") != 0){
+        if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") != 0){
           printf("here5");
 
           u_long actualIPaddr = inet_addr(ipaddr);
           uint8_t = (uint8_t)actualIPaddr;
-          interface.otherRouterIP = actualIPaddr;
+          inter.otherRouterIP = actualIPaddr;
         }
       }
     }
@@ -229,17 +229,17 @@ int main(){
       for(a2 = 0; a2 < 4; a2++){
         char pref2[10], ipaddr2[10], name2[10];
         fscanf(fptr2, "%s %s %s", pref2, ippaddr2, name2);
-        if(strcmp(name2, interface->name) == 0 && strcmp(ipaddr2, "-") == 0){
+        if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") == 0){
           printf("here8");
 
-          interface.prefix = pref2;
+          inter.prefix = pref2;
         }// got the other roouter spot address
-        if(strcmp(name2, interface->name) == 0 && strcmp(ipaddr2, "-") != 0){
+        if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") != 0){
           printf("here9");
 
           u_long actualIPaddr2 = inet_addr(ipaddr2);
           uint8_t = (uint8_t *) actualIPaddr2;
-          interface.otherRouterIP = actualIPaddr2;
+          inter.otherRouterIP = actualIPaddr2;
         }
       }
     }
