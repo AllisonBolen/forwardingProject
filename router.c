@@ -24,15 +24,19 @@ int main(){
     perror("getifaddrs");
     return 1;
   }
+
   struct interface {
         char* name;
         uint8_t MAC[6];
         uint8_t IP[4];
+        char prefix[11];
+        uint8_t otherRouterIP[8];
   };
-  struct interface interfaces[20];
+
+  struct interface interfaces[7];
   //  fd_set tmp_set = sockets;
   //have the list, loop over the list
-  int count =0;
+  int count = 0;
   int count2 = 0;
   for(tmp = ifaddr; tmp!=NULL; tmp=tmp->ifa_next){
     if(tmp->ifa_addr->sa_family==AF_PACKET){
@@ -68,6 +72,13 @@ int main(){
         count2++;
       }
     }
+  }
+  //populate from file
+  int j;
+
+  for(j = 0; j < sizeof(interfaces); j++){
+    printf("here1");
+    readFiles(&interfaces[j]);
   }
 
   printf("Ready to recieve now\n");
@@ -167,4 +178,69 @@ int main(){
     freeifaddrs(ifaddr);
     //exit
     return 0;
+  }
+
+  void readFiles(struct interface *interface){
+    printf("here2");
+
+    char* filename[20] = "r1-table.txt"
+    fptr = fopen(filename, "r");
+    if (fptr == NULL)
+    {
+        printf("Cannot open file \n");
+        exit(0);
+    }
+    else{
+      printf("here3");
+
+      int a;
+      for(a = 0; a < 3; a++){
+        char pref[10], ipaddr[10], name[10];
+        fscanf(fptr, "%s %s %s", pref, ippaddr, name);
+        if(strcmp(name, interface->name) == 0 && strcmp(ipaddr, "-") == 0){
+          printf("here4");
+
+          interface.prefix = pref;
+        }// got the other roouter spot address
+        if(strcmp(name, interface->name) == 0 && strcmp(ipaddr, "-") != 0){
+          printf("here5");
+
+          u_long actualIPaddr = inet_addr(ipaddr);
+          uint8_t = (uint8_t)actualIPaddr;
+          interface.otherRouterIP = actualIPaddr;
+        }
+      }
+    }
+
+    // read for file two
+    printf("here6");
+
+    char* filename2[20] = "r2-table.txt"
+    fptr2 = fopen(filename, "r");
+    if (fptr2 == NULL)
+    {
+        printf("Cannot open file \n");
+        exit(0);
+    }
+    else{
+      printf("here7");
+
+      int a2;
+      for(a2 = 0; a2 < 4; a2++){
+        char pref2[10], ipaddr2[10], name2[10];
+        fscanf(fptr2, "%s %s %s", pref2, ippaddr2, name2);
+        if(strcmp(name2, interface->name) == 0 && strcmp(ipaddr2, "-") == 0){
+          printf("here8");
+
+          interface.prefix = pref2;
+        }// got the other roouter spot address
+        if(strcmp(name2, interface->name) == 0 && strcmp(ipaddr2, "-") != 0){
+          printf("here9");
+
+          u_long actualIPaddr2 = inet_addr(ipaddr2);
+          uint8_t = (uint8_t *) actualIPaddr2;
+          interface.otherRouterIP = actualIPaddr2;
+        }
+      }
+    }
   }
