@@ -160,13 +160,11 @@ int main(){
                 send(i,buf, 98, 0);
 		            printf("%s\n", "Sending ICMP Response");
             }
-             // i.un.echo. id gets you the thing out of the icmp union
+          }
         }
+      }
     }
+    freeifaddrs(ifaddr);
+    //exit
+    return 0;
   }
-  //free the interface list when we don't need it anymore
-}
-freeifaddrs(ifaddr);
-  //exit
-  return 0;
-}
