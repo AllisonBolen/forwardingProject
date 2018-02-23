@@ -86,7 +86,7 @@ int main(){
 
   for(j = 0; j < sizeof(interfaces); j++){
     printf("\nhere1\n");
-    printf("\n interface: %s\n", interface[j].name);
+    printf("\n interface: %s\n", interfaces[j].name);
     readFiles((&interfaces)[j]);
   }
 
