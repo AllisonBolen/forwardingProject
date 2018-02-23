@@ -88,7 +88,7 @@ int main(){
     printf("\nhere1\n");
     printf("\n interface: %s\n", interfaces[j].name);
     //printf("\n interface: %d\n", interfaces[j].IP);
-    printf("\n interface: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC);
+    printf("\n interface: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC));
     readFiles((&interfaces)[j]);
   }
 
