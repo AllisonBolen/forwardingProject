@@ -194,7 +194,7 @@ int main(){
     printf("here2");
 
     char* filename[20] = "r1-table.txt"
-    FILE fptr = fopen(filename, "r");
+    FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
     {
         printf("Cannot open file \n");
@@ -206,7 +206,7 @@ int main(){
       int a;
       for(a = 0; a < 3; a++){
         char pref[10], ipaddr[10], name[10];
-        fscanf(fptr, "%s %s %s", pref, ippaddr, name);
+        fscanf(fptr, "%s %s %s", pref, ipaddr, name);
         if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") == 0){
           printf("here4");
 
@@ -216,8 +216,8 @@ int main(){
           printf("here5");
 
           u_long actualIPaddr = inet_addr(ipaddr);
-          uint8_t = (uint8_t)actualIPaddr;
-          inter.otherRouterIP = actualIPaddr;
+          uint8_t realIPaddr= (uint8_t)actualIPaddr;
+          inter.otherRouterIP = realIPaddr;
         }
       }
     }
@@ -226,7 +226,7 @@ int main(){
     printf("here6");
 
     char* filename2[20] = "r2-table.txt"
-    FILE fptr2 = fopen(filename, "r");
+    FILE *fptr2 = fopen(filename, "r");
     if (fptr2 == NULL)
     {
         printf("Cannot open file \n");
@@ -238,7 +238,7 @@ int main(){
       int a2;
       for(a2 = 0; a2 < 4; a2++){
         char pref2[10], ipaddr2[10], name2[10];
-        fscanf(fptr2, "%s %s %s", pref2, ippaddr2, name2);
+        fscanf(fptr2, "%s %s %s", pref2, ipaddr2, name2);
         if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") == 0){
           printf("here8");
 
@@ -248,7 +248,7 @@ int main(){
           printf("here9");
 
           u_long actualIPaddr2 = inet_addr(ipaddr2);
-          uint8_t = (uint8_t *) actualIPaddr2;
+          uint8_t realIPaddr = (uint8_t *) actualIPaddr2;
           inter.otherRouterIP = actualIPaddr2;
         }
       }
