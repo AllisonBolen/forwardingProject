@@ -88,7 +88,7 @@ int main(){
 
   for(j = 0; j < sizeof(interfaces); j++){
     printf("here1");
-    readFiles(&(interfaces)[j]);
+    readFiles((&interfaces)[j]);
   }
 
   printf("Ready to recieve now\n");
@@ -194,7 +194,7 @@ int main(){
     printf("here2");
 
     char* filename[20] = "r1-table.txt"
-    fptr = fopen(filename, "r");
+    FILE fptr = fopen(filename, "r");
     if (fptr == NULL)
     {
         printf("Cannot open file \n");
@@ -226,7 +226,7 @@ int main(){
     printf("here6");
 
     char* filename2[20] = "r2-table.txt"
-    fptr2 = fopen(filename, "r");
+    FILE fptr2 = fopen(filename, "r");
     if (fptr2 == NULL)
     {
         printf("Cannot open file \n");
