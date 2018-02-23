@@ -193,7 +193,7 @@ int main(){
   void readFiles(struct interface *inter){
     printf("here2");
 
-    char* filename[20] = "r1-table.txt";
+    char filename[20] = "r1-table.txt";
     FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
     {
@@ -225,7 +225,7 @@ int main(){
     // read for file two
     printf("here6");
 
-    char* filename2[20] = "r2-table.txt";
+    char filename2[20] = "r2-table.txt";
     FILE *fptr2 = fopen(filename, "r");
     if (fptr2 == NULL)
     {
