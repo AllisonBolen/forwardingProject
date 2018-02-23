@@ -77,9 +77,6 @@ int main(){
     if(tmp->ifa_addr->sa_family==AF_INET){
       if(!strncmp(&(tmp->ifa_name[3]),"eth",3)){
         memcpy(&interfaces[count2].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
-        printf("name of ip struct : %s\n ", interfaces[count2].name);
-        printf("name of ip tmp : %s\n ", tmp->ifa_name);
-        printf("%d\n", count2);
         count2++;
       }
     }
@@ -88,7 +85,7 @@ int main(){
   int j;
 
   for(j = 0; j < sizeof(interfaces); j++){
-    printf("here1");
+    printf("\nhere1\n");
     readFiles((&interfaces)[j]);
   }
 
