@@ -88,7 +88,7 @@ int main(){
     printf("\nhere1\n");
     printf("\n interface: %s\n", interfaces[j].name);
     //printf("\n interface: %d\n", interfaces[j].IP);
-    printf("\n interface: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC));
+    printf("\n interface MAC: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC));
     readFiles((&interfaces)[j]);
   }
 
@@ -203,7 +203,6 @@ int main(){
     }
     else{
       printf("here3");
-
       int a;
       for(a = 0; a < 3; a++){
         char pref[10], ipaddr[10], name[10];
@@ -222,20 +221,19 @@ int main(){
         }
       }
     }
+    fclose(fptr);
 
     // read for file two
     printf("here6");
 
     char filename2[20] = "r2-table.txt";
     FILE *fptr2 = fopen(filename, "r");
-    if (fptr2 == NULL)
-    {
+    if (fptr2 == NULL){
         printf("Cannot open file \n");
         exit(0);
     }
     else{
       printf("here7");
-
       int a2;
       for(a2 = 0; a2 < 4; a2++){
         char pref2[10], ipaddr2[10], name2[10];
@@ -254,4 +252,5 @@ int main(){
         }
       }
     }
+    fclose(fptr2);
   }
