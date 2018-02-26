@@ -31,7 +31,7 @@ struct interface {
 // };
 
 //void readFiles(struct interface *inter);
-void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header eh);
+void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header eh, int i);
 int main(){
   fd_set sockets;
   FD_ZERO(&sockets);
@@ -120,7 +120,7 @@ int main(){
         memcpy(&eh,&buf[0],14);
         int type = ntohs(eh.ether_type);
         if(type == 0x0806){ // got an arp packet
-          arpPackets(interfaces, buf, 7, eh);
+          arpPackets(interfaces, buf, 7, eh, i);
           //send(i, buf, 42, 0);
           // printf("got a packet in arp\n");
           // //build the response for arp
@@ -204,7 +204,7 @@ int main(){
     return 0;
   }
 
-void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header eh){
+void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header eh, int i){
   printf("got a packet in arp\n");
   //build the response for arp
   struct ether_header ethHdrResp;
