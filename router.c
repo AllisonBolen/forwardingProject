@@ -199,8 +199,9 @@ void readFiles(struct table *tableEle){
     else{
       printf("here3");
       int count = 0;
+      char pref[10], ipaddr[10], name[10];
       while(fscanf(fptr, "%s %s %s", pref, ipaddr, name) != EOF){
-        char pref[10], ipaddr[10], name[10];
+
         tableEle[count]->name = strdup(name);
         tableEle[count]->prefix = strdup(pref);
         if(strcmp(ipaddr, "-") != 0){
