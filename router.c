@@ -189,7 +189,7 @@ int main(){
 void readFiles(struct table *tableEle){
     printf("here2");
     char* filename[12];
-    fgets(filname, 12, stdin);
+    fgets(filename, 12, stdin);
     FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
     {
