@@ -13,6 +13,7 @@
 #include <netinet/ip_icmp.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
+void readFiles(struct interface *inter, struct table *tableInfo);
 int main(){
     fd_set sockets;
     FD_ZERO(&sockets);
@@ -22,17 +23,22 @@ int main(){
       perror("getifaddrs");
       return 1;
     }
+
     struct interface {
           char* name;
           uint8_t MAC[6];
           uint8_t IP[4];
+          int socket;
     };
+
     struct tabel{
           unint8_t ip[4];
           char* prefix;
           char* name;
     };
+
     struct interface interfaces[7];
+    struct table tableInfo[7];
     int count =0;
     int count2 = 0;
     for(tmp = ifaddr; tmp!=NULL; tmp=tmp->ifa_next){
@@ -57,18 +63,28 @@ int main(){
         	if(bind(packet_socket,tmp->ifa_addr,sizeof(struct sockaddr_ll))==-1){
         	  perror("bind");
         	}
+          interfaces[count].socket = packet_socket;
         	count++;
         }
-      }if(tmp->ifa_addr->sa_family==AF_INET){
+      }
+      if(tmp->ifa_addr->sa_family==AF_INET){
          if(!strncmp(&(tmp->ifa_name[3]),"eth",3)){
            memcpy(&interfaces[count2].IP, &((struct sockaddr_in*)tmp->ifa_addr)->sin_addr.s_addr,4);
-           printf("name of ip struct : %s\n ", interfaces[count2].name);
-           printf("name of ip tmp : %s\n ", tmp->ifa_name);
-           printf("%d\n", count2);
           count2++;
         }
       }
     }
+
+
+    for(j = 0; j < sizeof(interfaces); j++){
+      printf("\nhere1\n");
+      printf("\n interface: %s\n", interfaces[j].name);
+      //printf("\n interface: %d\n", interfaces[j].IP);
+      printf("\n interface MAC: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC));
+      readFiles((&interfaces)[j], &tableInfo);
+    }
+
+
     printf("Ready to recieve now\n");
     while(1){
       char buf[1500];
@@ -171,3 +187,33 @@ int main(){
     //exit
     return 0;
 }
+// populate tabel struct
+void readFiles(struct interface *inter, struct table *tableInfo){
+    printf("here2");
+    char* filename[12];
+    fgets(filname, 12, stdin);
+    FILE *fptr = fopen(filename, "r");
+    if (fptr == NULL)
+    {
+        printf("Cannot open file \n");
+        exit(0);
+    }
+    else{
+      printf("here3");
+      int count = 0;
+      while(fscanf(fptr, "%s %s %s", pref, ipaddr, name) != EOF){
+        char pref[10], ipaddr[10], name[10];
+        //fscanf(fptr, "%s %s %s", pref, ipaddr, name);
+        tableInfo[count]->name = strdup(name);
+        tableInfo[count]->prefix = strdup(pref);
+        if(strcmp(ipaddr, "-") != 0){
+          in_addr_t actualIPaddr = inet_addr(ipaddr);
+          memcpy(tableInfo[count]->ip,&actualIPaddr,4);
+        }
+        print("\nthis si that tabe name at count: %s\n ", tableInfo[count]->name);
+        count ++;
+      }
+
+    }
+    fclose(fptr);
+  }
