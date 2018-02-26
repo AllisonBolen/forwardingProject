@@ -40,7 +40,7 @@ int main(){
         uint8_t MAC[6];
         uint8_t IP[4];
   };
-  struct interface interfaces[20];
+  struct interface interfaces[7];
 
   //  fd_set tmp_set = sockets;
   //have the list, loop over the list
@@ -207,7 +207,7 @@ int main(){
                 memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
                 memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
                 memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
-                send(i,buf, sizeof(buf), 0);
+                send(i,buf, 98, 0);
 		printf("%s\n", "Sending ICMP Response");
 
             }
