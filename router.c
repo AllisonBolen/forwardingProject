@@ -14,6 +14,19 @@
 //Allison Bolen, Cade Baker, Andy Hung
 
 void readFiles(struct table *tableEle);
+
+struct tabel {
+      uint8_t ip[4];
+      char* prefix;
+      char* name;
+};
+
+struct interface {
+      char* name;
+      uint8_t MAC[6];
+      uint8_t IP[4];
+      int socket;
+};
 int main(){
     fd_set sockets;
     FD_ZERO(&sockets);
@@ -23,19 +36,6 @@ int main(){
       perror("getifaddrs");
       return 1;
     }
-
-    struct interface {
-          char* name;
-          uint8_t MAC[6];
-          uint8_t IP[4];
-          int socket;
-    };
-
-    struct tabel {
-          uint8_t ip[4];
-          char* prefix;
-          char* name;
-    };
 
     struct interface interfaces[7];
     struct table tableInfo[7];
@@ -201,7 +201,6 @@ void readFiles(struct table *tableEle){
       int count = 0;
       char pref[10], ipaddr[10], name[10];
       while(fscanf(fptr, "%s %s %s", pref, ipaddr, name) != EOF){
-
         tableEle[count]->name = strdup(name);
         tableEle[count]->prefix = strdup(pref);
         if(strcmp(ipaddr, "-") != 0){
