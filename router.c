@@ -15,7 +15,7 @@
 
 void readFiles(struct table *tableEle);
 
-struct tabel {
+struct table {
       uint8_t ip[4];
       char* prefix;
       char* name;
@@ -27,6 +27,7 @@ struct interface {
       uint8_t IP[4];
       int socket;
 };
+
 int main(){
     fd_set sockets;
     FD_ZERO(&sockets);
@@ -185,7 +186,7 @@ int main(){
     //exit
     return 0;
 }
-// populate tabel struct
+// populate table struct
 void readFiles(struct table *tableEle){
     printf("here2");
     char* filename[12];
