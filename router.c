@@ -31,7 +31,7 @@ struct interface {
 // };
 
 //void readFiles(struct interface *inter);
-void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header *eh);
+void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header eh);
 int main(){
   fd_set sockets;
   FD_ZERO(&sockets);
@@ -121,7 +121,7 @@ int main(){
         int type = ntohs(eh.ether_type);
         // Cade this is the portion of teh code that detects if its an arp request destined for the current router could you export this code to a method so it can be reused
         if(type == 0x0806){ // got an arp packet
-          arpPackets(interfaces, buf, 7, &eh);
+          arpPackets(interfaces, buf, 7, eh);
           send(i, buf, 42, 0);
           // printf("got a packet in arp\n");
           // //build the response for arp
@@ -205,7 +205,7 @@ int main(){
     return 0;
   }
 
-void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header *eh){
+void arpPackets(struct interface interfaces[], char *buf, int size, struct ether_header eh){
   printf("got a packet in arp\n");
   //build the response for arp
   struct ether_header ethHdrResp;
