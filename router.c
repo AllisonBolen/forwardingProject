@@ -18,11 +18,17 @@ struct interface {
       char* name;
       uint8_t MAC[6];
       uint8_t IP[4];
-      char prefix;
-      uint8_t otherRouterIP;
+      int socket;
+
+      // char prefix;
+      // uint8_t otherRouterIP;
 };
 
-
+struct tabel{
+    unint8_t ip[4];
+    char* prefix;
+    char* name;
+}
 void readFiles(struct interface *inter);
 int main(){
   fd_set sockets;
@@ -71,6 +77,7 @@ int main(){
 	      if(bind(packet_socket,tmp->ifa_addr,sizeof(struct sockaddr_ll))==-1){
 	        perror("bind");
         }
+        interfaces[count].socket = packet_socket; // add sockests to list of structs
 	     count++;
       }
     }
@@ -110,6 +117,7 @@ int main(){
         //ether header for any packet
         memcpy(&eh,&buf[0],14);
         int type = ntohs(eh.ether_type);
+        // Cade this is the portion of teh code that detects if its an arp request destined for the current router could you export this code to a method so it can be reused
         if(type == 0x0806){ // got an arp packet
           printf("got a packet in arp\n");
           //build the response for arp
@@ -141,6 +149,7 @@ int main(){
           memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
           send(i, buf, 42, 0);// send the arp
         }
+        // this detects wether its an ip packet
         if(type == ETHERTYPE_IP){ // got an icmp packet
 	          printf("%s\n", "Received ICMP Request Packet");
             struct iphdr ipReq;
@@ -148,6 +157,7 @@ int main(){
             //struct ether_header ethHdr;
             struct ether_header ethResp;
             memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
+            //Cade this detects if its an ICMP packet and sends back a response if the icmp was destined for the router. could you also extract this into a method for reuse.
             if((ipReq.protocol) == 1){
                 struct icmphdr icmpReq;
                 struct icmphdr icmpResp;
@@ -190,11 +200,11 @@ int main(){
     //exit
     return 0;
   }
-
+ // Andy can oyu fix this so it will ask for user input for a file name and populate teh table structure accordingly.
   void readFiles(struct interface *inter){
     printf("here2");
 
-    char filename[20] = "r1-table.txt";
+    char filename[20] = "r1-table.txt"; // user input fo rfile name please not every router should read
     FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
     {
@@ -210,47 +220,16 @@ int main(){
         if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") == 0){
           printf("here4");
           printf("\ndata: %s %s %s \n",pref, ipaddr, name);
-          inter->prefix = pref[10];
+          inter->prefix = strdup(pref);
         }// got the other roouter spot address
         if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") != 0){
           printf("here5");
           printf("\ndata: %s %s %s \n",pref, ipaddr, name);
-          u_long actualIPaddr = inet_addr(ipaddr);
-          uint8_t realIPaddr= (uint8_t)actualIPaddr;
+          in_addr_t actualIPaddr = inet_addr(ipaddr);
+          memcpy(table->ip,&actualIPaddr,4);
           inter->otherRouterIP = realIPaddr;
         }
       }
     }
     fclose(fptr);
-
-    // read for file two
-    printf("here6");
-
-    char filename2[20] = "r2-table.txt";
-    FILE *fptr2 = fopen(filename, "r");
-    if (fptr2 == NULL){
-        printf("Cannot open file \n");
-        exit(0);
-    }
-    else{
-      printf("here7");
-      int a2;
-      for(a2 = 0; a2 < 4; a2++){
-        char pref2[10], ipaddr2[10], name2[10];
-        fscanf(fptr2, "%s %s %s", pref2, ipaddr2, name2);
-        if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") == 0){
-          printf("here8");
-          printf("\ndata %s %s %s \n", pref2, ipaddr2, name2 );
-          inter->prefix = pref2[10];
-        }// got the other roouter spot address
-        if(strcmp(name2, inter->name) == 0 && strcmp(ipaddr2, "-") != 0){
-          printf("here9");
-          printf("\ndata %s %s %s \n", pref2, ipaddr2, name2 );
-          u_long actualIPaddr2 = inet_addr(ipaddr2);
-          uint8_t realIPaddr = (uint8_t ) actualIPaddr2;
-          inter->otherRouterIP = realIPaddr;
-        }
-      }
-    }
-    fclose(fptr2);
   }
