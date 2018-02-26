@@ -93,13 +93,13 @@ int main(){
   //populate from file
   int j;
 
-  for(j = 0; j < sizeof(interfaces); j++){
-    printf("\nhere1\n");
-    printf("\n interface: %s\n", interfaces[j].name);
-    //printf("\n interface: %d\n", interfaces[j].IP);
-    printf("\n interface MAC: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC));
-    readFiles((&interfaces)[j]);
-  }
+  // for(j = 0; j < sizeof(interfaces); j++){
+  //   printf("\nhere1\n");
+  //   printf("\n interface: %s\n", interfaces[j].name);
+  //   //printf("\n interface: %d\n", interfaces[j].IP);
+  //   printf("\n interface MAC: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC));
+  //   readFiles((&interfaces)[j]);
+  // }
 
   printf("Ready to recieve now\n");
   while(1){
