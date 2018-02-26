@@ -31,7 +31,7 @@ int main(){
           int socket;
     };
 
-    struct tabel{
+    struct tabel {
           uint8_t ip[4];
           char* prefix;
           char* name;
