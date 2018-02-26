@@ -119,10 +119,9 @@ int main(){
         //ether header for any packet
         memcpy(&eh,&buf[0],14);
         int type = ntohs(eh.ether_type);
-        // Cade this is the portion of teh code that detects if its an arp request destined for the current router could you export this code to a method so it can be reused
         if(type == 0x0806){ // got an arp packet
           arpPackets(interfaces, buf, 7, eh);
-          send(i, buf, 42, 0);
+          //send(i, buf, 42, 0);
           // printf("got a packet in arp\n");
           // //build the response for arp
           // struct ether_header ethHdrResp;
