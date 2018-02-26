@@ -13,7 +13,7 @@
 #include <netinet/ip_icmp.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
-void readFiles(struct interface *inter, struct table *tableInfo);
+void readFiles(struct interface *inter, struct table tableInfo[]);
 int main(){
     fd_set sockets;
     FD_ZERO(&sockets);
@@ -76,12 +76,10 @@ int main(){
     }
 
 
-    for(j = 0; j < sizeof(interfaces); j++){
+    for(j = 0; j < sizeof(tableInfo); j++){
       printf("\nhere1\n");
-      printf("\n interface: %s\n", interfaces[j].name);
-      //printf("\n interface: %d\n", interfaces[j].IP);
-      printf("\n interface MAC: %s\n", ether_ntoa( (struct ether_addr*) interfaces[j].MAC));
-      readFiles((&interfaces)[j], &tableInfo);
+
+      readFiles( (&tableInfo)[j]);
     }
 
 
@@ -188,7 +186,7 @@ int main(){
     return 0;
 }
 // populate tabel struct
-void readFiles(struct interface *inter, struct table *tableInfo){
+void readFiles(struct table *tableEle){
     printf("here2");
     char* filename[12];
     fgets(filname, 12, stdin);
@@ -203,17 +201,15 @@ void readFiles(struct interface *inter, struct table *tableInfo){
       int count = 0;
       while(fscanf(fptr, "%s %s %s", pref, ipaddr, name) != EOF){
         char pref[10], ipaddr[10], name[10];
-        //fscanf(fptr, "%s %s %s", pref, ipaddr, name);
-        tableInfo[count]->name = strdup(name);
-        tableInfo[count]->prefix = strdup(pref);
+        tableEle[count]->name = strdup(name);
+        tableEle[count]->prefix = strdup(pref);
         if(strcmp(ipaddr, "-") != 0){
           in_addr_t actualIPaddr = inet_addr(ipaddr);
-          memcpy(tableInfo[count]->ip,&actualIPaddr,4);
+          memcpy(tableEle[count]->ip,&actualIPaddr,4);
         }
-        print("\nthis si that tabe name at count: %s\n ", tableInfo[count]->name);
+        print("\nthis is that table name at count: %s\n ", tableEle[count]->name);
         count ++;
       }
-
     }
     fclose(fptr);
   }
