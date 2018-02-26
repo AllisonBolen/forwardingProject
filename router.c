@@ -29,7 +29,9 @@ struct tabel{
     char* prefix;
     char* name;
 }
-void readFiles(struct interface *inter);
+
+//void readFiles(struct interface *inter);
+void arpPackets(struct interface *interfaces, char buf, int size, int i);
 int main(){
   fd_set sockets;
   FD_ZERO(&sockets);
@@ -119,35 +121,36 @@ int main(){
         int type = ntohs(eh.ether_type);
         // Cade this is the portion of teh code that detects if its an arp request destined for the current router could you export this code to a method so it can be reused
         if(type == 0x0806){ // got an arp packet
-          printf("got a packet in arp\n");
-          //build the response for arp
-          struct ether_header ethHdrResp;
-          struct ether_arp arpReq, arpResp;
-          memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));// get the arp info into a header struct
-          memcpy(&arpResp.arp_tha, &arpReq.arp_sha, 6); // put the source into teh new packets dst
-          int j;
-          u_char wantedIp[4];
-          memcpy(&wantedIp[0],arpReq.arp_tpa,4);
-          for(j = 0; j< 20; j++){
-            if(memcmp(interfaces[j].IP, wantedIp, 4) == 0){
-                memcpy(&arpResp.arp_sha, &interfaces[j].MAC, 6); // get mmy mac and make the new source
-            }
-          }
-          memcpy(&arpResp.arp_tpa, &arpReq.arp_spa, 4);  // switch ips
-          memcpy(&arpResp.arp_spa, &arpReq.arp_tpa, 4); //switch ips
-          arpResp.ea_hdr.ar_op = htons(2); // change op code for reply
-          arpResp.ea_hdr.ar_pro = arpReq.ea_hdr.ar_pro;
-          arpResp.ea_hdr.ar_hln = arpReq.ea_hdr.ar_hln;
-          arpResp.ea_hdr.ar_pln = arpReq.ea_hdr.ar_pln;
-          arpResp.ea_hdr.ar_hrd = arpReq.ea_hdr.ar_hrd;
-          // change ehternet header
-          memcpy(&ethHdrResp.ether_shost, &arpResp.arp_sha, 6);// get mac of me to them
-          memcpy(&ethHdrResp.ether_dhost, &eh.ether_shost, 6);//
-          ethHdrResp.ether_type = eh.ether_type;
-            // fill the buffer
-          memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
-          memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
-          send(i, buf, 42, 0);// send the arp
+          arpPackets(&interfaces, buf, 20, i);
+          // printf("got a packet in arp\n");
+          // //build the response for arp
+          // struct ether_header ethHdrResp;
+          // struct ether_arp arpReq, arpResp;
+          // memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));// get the arp info into a header struct
+          // memcpy(&arpResp.arp_tha, &arpReq.arp_sha, 6); // put the source into teh new packets dst
+          // int j;
+          // u_char wantedIp[4];
+          // memcpy(&wantedIp[0],arpReq.arp_tpa,4);
+          // for(j = 0; j< 20; j++){
+          //   if(memcmp(interfaces[j].IP, wantedIp, 4) == 0){
+          //       memcpy(&arpResp.arp_sha, &interfaces[j].MAC, 6); // get mmy mac and make the new source
+          //   }
+          // }
+          // memcpy(&arpResp.arp_tpa, &arpReq.arp_spa, 4);  // switch ips
+          // memcpy(&arpResp.arp_spa, &arpReq.arp_tpa, 4); //switch ips
+          // arpResp.ea_hdr.ar_op = htons(2); // change op code for reply
+          // arpResp.ea_hdr.ar_pro = arpReq.ea_hdr.ar_pro;
+          // arpResp.ea_hdr.ar_hln = arpReq.ea_hdr.ar_hln;
+          // arpResp.ea_hdr.ar_pln = arpReq.ea_hdr.ar_pln;
+          // arpResp.ea_hdr.ar_hrd = arpReq.ea_hdr.ar_hrd;
+          // // change ehternet header
+          // memcpy(&ethHdrResp.ether_shost, &arpResp.arp_sha, 6);// get mac of me to them
+          // memcpy(&ethHdrResp.ether_dhost, &eh.ether_shost, 6);//
+          // ethHdrResp.ether_type = eh.ether_type;
+          //   // fill the buffer
+          // memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
+          // memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
+          // send(i, buf, 42, 0);// send the arp
         }
         // this detects wether its an ip packet
         if(type == ETHERTYPE_IP){ // got an icmp packet
@@ -200,36 +203,71 @@ int main(){
     //exit
     return 0;
   }
- // Andy can oyu fix this so it will ask for user input for a file name and populate teh table structure accordingly.
-  void readFiles(struct interface *inter){
-    printf("here2");
 
-    char filename[20] = "r1-table.txt"; // user input fo rfile name please not every router should read
-    FILE *fptr = fopen(filename, "r");
-    if (fptr == NULL)
-    {
-        printf("Cannot open file \n");
-        exit(0);
+void arpPackets(strut interface *interfaces, char buf, int size, int i){
+  printf("got a packet in arp\n");
+  //build the response for arp
+  struct ether_header ethHdrResp;
+  struct ether_arp arpReq, arpResp;
+  memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));// get the arp info into a header struct
+  memcpy(&arpResp.arp_tha, &arpReq.arp_sha, 6); // put the source into teh new packets dst
+  int j;
+  u_char wantedIp[4];
+  memcpy(&wantedIp[0],arpReq.arp_tpa,4);
+  for(j = 0; j< 20; j++){
+    if(memcmp(interfaces[j].IP, wantedIp, 4) == 0){
+        memcpy(&arpResp.arp_sha, &interfaces[j].MAC, 6); // get mmy mac and make the new source
     }
-    else{
-      printf("here3");
-      int a;
-      for(a = 0; a < 3; a++){
-        char pref[10], ipaddr[10], name[10];
-        fscanf(fptr, "%s %s %s", pref, ipaddr, name);
-        if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") == 0){
-          printf("here4");
-          printf("\ndata: %s %s %s \n",pref, ipaddr, name);
-          inter->prefix = strdup(pref);
-        }// got the other roouter spot address
-        if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") != 0){
-          printf("here5");
-          printf("\ndata: %s %s %s \n",pref, ipaddr, name);
-          in_addr_t actualIPaddr = inet_addr(ipaddr);
-          memcpy(table->ip,&actualIPaddr,4);
-          inter->otherRouterIP = realIPaddr;
-        }
-      }
-    }
-    fclose(fptr);
   }
+  memcpy(&arpResp.arp_tpa, &arpReq.arp_spa, 4);  // switch ips
+  memcpy(&arpResp.arp_spa, &arpReq.arp_tpa, 4); //switch ips
+  arpResp.ea_hdr.ar_op = htons(2); // change op code for reply
+  arpResp.ea_hdr.ar_pro = arpReq.ea_hdr.ar_pro;
+  arpResp.ea_hdr.ar_hln = arpReq.ea_hdr.ar_hln;
+  arpResp.ea_hdr.ar_pln = arpReq.ea_hdr.ar_pln;
+  arpResp.ea_hdr.ar_hrd = arpReq.ea_hdr.ar_hrd;
+  // change ehternet header
+  memcpy(&ethHdrResp.ether_shost, &arpResp.arp_sha, 6);// get mac of me to them
+  memcpy(&ethHdrResp.ether_dhost, &eh.ether_shost, 6);//
+  ethHdrResp.ether_type = eh.ether_type;
+    // fill the buffer
+  memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
+  memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
+  send(i, buf, 42, 0);//
+}
+
+
+
+ // Andy can oyu fix this so it will ask for user input for a file name and populate teh table structure accordingly.
+  // void readFiles(struct interface *inter){
+  //   printf("here2");
+  //
+  //   char filename[20] = "r1-table.txt"; // user input fo rfile name please not every router should read
+  //   FILE *fptr = fopen(filename, "r");
+  //   if (fptr == NULL)
+  //   {
+  //       printf("Cannot open file \n");
+  //       exit(0);
+  //   }
+  //   else{
+  //     printf("here3");
+  //     int a;
+  //     for(a = 0; a < 3; a++){
+  //       char pref[10], ipaddr[10], name[10];
+  //       fscanf(fptr, "%s %s %s", pref, ipaddr, name);
+  //       if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") == 0){
+  //         printf("here4");
+  //         printf("\ndata: %s %s %s \n",pref, ipaddr, name);
+  //         inter->prefix = strdup(pref);
+  //       }// got the other roouter spot address
+  //       if(strcmp(name, inter->name) == 0 && strcmp(ipaddr, "-") != 0){
+  //         printf("here5");
+  //         printf("\ndata: %s %s %s \n",pref, ipaddr, name);
+  //         in_addr_t actualIPaddr = inet_addr(ipaddr);
+  //         memcpy(table->ip,&actualIPaddr,4);
+  //         inter->otherRouterIP = realIPaddr;
+  //       }
+  //     }
+  //   }
+  //   fclose(fptr);
+  // }
