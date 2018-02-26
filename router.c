@@ -13,7 +13,7 @@
 #include <netinet/ip_icmp.h>
 //Allison Bolen, Cade Baker, Andy Hung
 
-void readFiles(struct interface *inter, struct table tableInfo[]);
+void readFiles(struct table *tableInfo);
 int main(){
     fd_set sockets;
     FD_ZERO(&sockets);
