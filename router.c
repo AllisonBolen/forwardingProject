@@ -75,7 +75,7 @@ int main(){
       }
     }
 
-
+    int j;
     for(j = 0; j < sizeof(tableInfo); j++){
       printf("\nhere1\n");
 
