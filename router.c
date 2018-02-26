@@ -32,7 +32,7 @@ int main(){
     };
 
     struct tabel{
-          unint8_t ip[4];
+          uint8_t ip[4];
           char* prefix;
           char* name;
     };
