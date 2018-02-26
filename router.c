@@ -233,7 +233,7 @@ void arpPackets(struct interface interfaces[], char *buf, int size, struct ether
     // fill the buffer
   memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
   memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
-  // send(i, buf, 42, 0);//
+  send(i, buf, 42, 0);//
 }
 
 
