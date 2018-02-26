@@ -31,7 +31,7 @@ struct interface {
 // };
 
 //void readFiles(struct interface *inter);
-void arpPackets(struct interface interfaces, char *buf, int size);
+void arpPackets(struct interface interfaces[], char *buf, int size);
 int main(){
   fd_set sockets;
   FD_ZERO(&sockets);
