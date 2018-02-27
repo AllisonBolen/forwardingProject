@@ -82,12 +82,6 @@ int main(){
     }
 
       readFiles(tableInfo);
-      // int i = 0;
-      // for (i = 0 ; i < 3; i++){
-      //   printf("table info: %s\n", tableInfo[i].name);
-      //   printf("table info: %s\n", tableInfo[i].prefix);
-      //   printf("table info: %s\n", tableInfo[i].ip);
-      // }
 
     printf("Ready to recieve now\n");
     while(1){
@@ -110,9 +104,22 @@ int main(){
 
         if(type == 0x0806){ // got an arp packet
           printf("THIS IS ARP");
-          //is this arp for the router?
-          checkdestination(buf);
+          // is it a response or a request
+          struct ether_arp arpReq;
+          memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
+          if(arpReq.ar_op==1){
+            // we got a Request
+            //respond to said request because you are the only one who can see it
+            arpPacket(interfaces, eh, buf);
+            send(i, buf, 42, 0);
+          }
+          if(arpReq.ar_op==2){
+            // we got a Response
 
+          }
+          //is this arp for the router?
+
+          // checkdestination(buf);
 
           arpPacket(interfaces, eh, buf);
           send(i, buf, 42, 0);// send the arp
@@ -137,14 +144,22 @@ int main(){
   freeifaddrs(ifaddr);
   return 0;
 }
+// return one if its the destiontion of the router
+// int checkdestination(buf, struct interface intefaces[]){
+//   struct ether_header ethReq;
+//   memcpy(&ethReq, &buf[0], 14);
+//   int i;
+//   for(i = 0 ; i < sizeof(interfaces); i++){
+//     if(memcmp(ethReq.ether_dhost==interfaces[i].MAC)){// may have an issue
+//
+//     }
+//   }
+// }
 
-void checkdestination(buf){
-
-}
-
-void checkRouteNext(buf){
-
-}
+// check the prefix for the next thing if its
+// int checkRouteNext(buf){
+//
+// }
 
 // populate table struct
 void readFiles(struct table tableInfo[7]){
