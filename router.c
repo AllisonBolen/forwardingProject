@@ -80,15 +80,10 @@ int main(){
       }
     }
 
-    // int j;
-    // for(j = 0; j < sizeof(tableInfo); j++){
-    //   printf("\nhere1\n");
-
       readFiles(tableInfo);
       printf("table info: %s\n", tableInfo[0].name);
       printf("table info: %s\n", tableInfo[0].prefix);
-      printf("table info: %s\n", tableInfo[0].ip));
-    // }
+      printf("table info: %s\n", tableInfo[0].ip);
 
 
     printf("Ready to recieve now\n");
@@ -178,7 +173,7 @@ int main(){
             icmpResp.un.echo.id = icmpReq.un.echo.id;
             icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
 
-                  //fill the buffer again
+            //fill the buffer again
             memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
             memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
             memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
@@ -190,8 +185,7 @@ int main(){
     }
   }
   freeifaddrs(ifaddr);
-    //exit
-    return 0;
+  return 0;
 }
 // populate table struct
 void readFiles(struct table tableInfo[7]){
