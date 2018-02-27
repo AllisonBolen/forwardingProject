@@ -105,7 +105,8 @@ int main(){
         int type = ntohs(eh.ether_type);
 
         if(type == 0x0806){ // got an arp packet
-          printf("THIS IS ARP");
+          printf("THIS IS ARP\n");
+          fflush(stdout);
           // is it a response or a request
           struct ether_arp arpReq;
           memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
