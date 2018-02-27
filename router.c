@@ -32,6 +32,8 @@ struct interface {
 void arpPacket(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(struct table tableInfo[7]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
+char saveICMPBuffer[1500];
+void saveICMP(char* buf);
 
 int main(){
     struct interface interfaces[7];
@@ -277,4 +279,9 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
   memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
+}
+
+void saveICMP(char *buf){
+  memcpy(saveICMPBuffer, buf, sizeof(saveICMPBuffer));
+  //printf("%s\n", saveICMPBuffer);
 }
