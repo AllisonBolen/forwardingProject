@@ -191,8 +191,8 @@ int main(){
 void readFiles(struct table *tableEle){
     printf("here2");
     char filename[12];
-    fgets(*filename, 12, stdin);
-    FILE *fptr = fopen(*filename, "r");
+    fgets(filename, 12, stdin);
+    FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
     {
         printf("Cannot open file \n");
