@@ -110,13 +110,13 @@ int main(){
           // is it a response or a request
           struct ether_arp arpReq;
           memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
-          if(arpReq.ea_hdr.ar_op==1){
+          if(ntohs(arpReq.ea_hdr.ar_op)== 1){
             // we got a Request
             //respond to said request because you are the only one who can see it
             arpPacket(interfaces, eh, buf);
             send(i, buf, 42, 0);
           }
-          if(arpReq.ea_hdr.ar_op==2){
+          if(ntohs(arpReq.ea_hdr.ar_op)==2){
             // we got a Response
             // send data to the ting that we got a response from
           }
