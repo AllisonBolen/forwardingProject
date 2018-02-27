@@ -83,7 +83,7 @@ int main(){
       for (i = 0 ; i < 3; i++){
         printf("table info: %s\n", tableInfo[i].name);
         printf("table info: %s\n", tableInfo[i].prefix);
-        //printf("table info: %s\n", tableInfo[i].ip);
+        printf("table info: %s\n", tableInfo[i].ip);
       }
 
     printf("Ready to recieve now\n");
