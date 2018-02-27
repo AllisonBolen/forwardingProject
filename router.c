@@ -179,7 +179,7 @@ int main(){
           in_addr_t tableIP;
           char name[20];
           int k;
-          for(k = 0 ; k < 7; k++){
+          for(k = 0 ; k < 4; k++){
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
