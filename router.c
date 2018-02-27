@@ -183,6 +183,7 @@ int main(){
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
+            printf("\nIm Here right now\n");
             memcpy(&byteCmp, &tableInfo[k].prefix[10],2); //print these at some point
             char tablePrefIP[9];
             memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
