@@ -13,6 +13,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <netinet/ip_icmp.h>
+//noice
 //Allison Bolen, Cade Baker, Andy Hung
 
 
@@ -86,6 +87,7 @@ int main(){
       readFiles(tableInfo);
       printf("table info: %s\n", tableInfo[0].name);
       printf("table info: %s\n", tableInfo[0].prefix);
+      printf("table info: %s\n", inet_ntoa(tableInfo[0].ip));
     // }
 
 
