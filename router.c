@@ -19,7 +19,7 @@
 
 
 struct table {
-      uint8_t ip[4];
+      char* ip;
       char* prefix;
       char* name;
 };
@@ -87,7 +87,7 @@ int main(){
       readFiles(tableInfo);
       printf("table info: %s\n", tableInfo[0].name);
       printf("table info: %s\n", tableInfo[0].prefix);
-      printf("table info: %s\n", inet_ntoa(tableInfo[0].ip));
+      printf("table info: %s\n", tableInfo[0].ip));
     // }
 
 
@@ -213,8 +213,9 @@ void readFiles(struct table tableInfo[7]){
         tableInfo[count].name = strdup(name);
         tableInfo[count].prefix = strdup(pref);
         if(strcmp(ipaddr, "-") != 0){
-          in_addr_t actualIPaddr = inet_addr(ipaddr);
-          memcpy(tableInfo[count].ip,&actualIPaddr,4);
+          // in_addr_t actualIPaddr = inet_addr(ipaddr);
+          // memcpy(tableInfo[count].ip,&actualIPaddr,4);
+          tableInfo[count].ip = strdup(ipaddr);
         }
         printf("\nthis is that table name at count: %s\n ", tableInfo[count].name);
         count ++;
