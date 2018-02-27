@@ -83,7 +83,7 @@ int main(){
     for(j = 0; j < sizeof(tableInfo); j++){
       printf("\nhere1\n");
 
-      //readFiles( (&tableInfo)[j]);
+      readFiles( (&tableInfo)[j]);
     }
 
 
