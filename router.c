@@ -34,7 +34,7 @@ struct message{
   int valid;
   in_addr_t waitingfor;
 };
-
+void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]);
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(struct table tableInfo[7]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
@@ -204,7 +204,7 @@ int main(){
               }
             }
           }
-	}
+
           // store the message
           int m;
           for(m = 0 ; m < sizeof(storedMessage); m++){
@@ -229,7 +229,7 @@ int main(){
         }
       }
     }
-
+  }
   freeifaddrs(ifaddr);
   return 0;
 }
