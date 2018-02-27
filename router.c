@@ -198,7 +198,7 @@ void readFiles(struct table tableInfo[7]){
     memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
   }
 
-icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf){
+void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf){
   struct icmphdr icmpReq;
   struct icmphdr icmpResp;
   memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
