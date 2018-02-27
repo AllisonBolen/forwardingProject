@@ -134,7 +134,7 @@ int main(){
               if(storedMessage[y].valid == 1){
                 memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
                 memcpy(&ipReq, &storedMessage[y].buff[sizeof(struct ether_header)], sizeof(struct iphdr)); //from the adta packet
-                if(memcmp(&arpReq.spa, &storedMessage[y].waitingfor)==0){
+                if(memcmp(&arpReq.spa, &storedMessage[y].waitingfor, 4)==0){
                   // switch the source to r1 and add the mac of the arp resp to teh message packt
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
@@ -158,7 +158,7 @@ int main(){
           int n;
           int forus = 0;
           for(n =0;n < sizeof(interfaces); n++){ // check for if its me
-            if(memcmp(ipReq.daddr, interfaces[n].ip) == 0){ // if it is do like part one
+            if(memcmp(ipReq.daddr, interfaces[n].ip, 4) == 0){ // if it is do like part one
               forus=1;
               if((ipReq.protocol) == 1){
                 struct icmphdr icmpReq;
@@ -265,7 +265,7 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     struct ether_arp arpReq;
     int j;
     for(j = 0; j< 20; j++){
-      if(memcmp(interfaces[j].IP, tableIP, 4) == 0){
+      if(memcmp(&interfaces[j].IP, &tableIP, 4) == 0){
           memcpy(&arpReq.arp_sha, &interfaces[j].MAC, 6); // get my mac and make the new source
       }
     }
