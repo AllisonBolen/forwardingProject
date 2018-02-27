@@ -205,13 +205,13 @@ void readFiles(struct table *tableEle){
       int count = 0;
       char pref[10], ipaddr[10], name[10];
       while(fscanf(fptr, "%s %s %s", pref, ipaddr, name) != EOF){
-        tableEle[count]->name = strdup(name);
-        tableEle[count]->prefix = strdup(pref);
+        tableEle[count].name = strdup(name);
+        tableEle[count].prefix = strdup(pref);
         if(strcmp(ipaddr, "-") != 0){
           in_addr_t actualIPaddr = inet_addr(ipaddr);
-          memcpy(tableEle[count]->ip,&actualIPaddr,4);
+          memcpy(tableEle[count].ip,&actualIPaddr,4);
         }
-        print("\nthis is that table name at count: %s\n ", tableEle[count]->name);
+        print("\nthis is that table name at count: %s\n ", tableEle[count].name);
         count ++;
       }
     }
