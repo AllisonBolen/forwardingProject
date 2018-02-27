@@ -29,6 +29,7 @@ struct interface {
       int socket;
 };
 
+void arpPacket(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(struct table tableInfo[7]);
 int main(){
     struct interface interfaces[7];
@@ -218,7 +219,7 @@ void readFiles(struct table tableInfo[7]){
     fclose(fptr);
   }
 
-  void arpPacket(struct interface interfaces, struct ether_header eh, char *buf){
+  void arpPacket(struct interface interfaces[], struct ether_header eh, char *buf){
     printf("got a packet in arp\n");
     //build the response for arp
     struct ether_header ethHdrResp;
