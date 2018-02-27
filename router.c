@@ -112,7 +112,7 @@ int main(){
             arpPacket(interfaces, eh, buf);
             send(i, buf, 42, 0);// send the arp
         }
-        printf("THIS IS A PROBLEM HERE")
+        printf("THIS IS A PROBLEM HERE");
         if(type == ETHERTYPE_IP){ // got an icmp packet
   	      printf("%s\n", "Received ICMP Request Packet");
           struct iphdr ipReq;
