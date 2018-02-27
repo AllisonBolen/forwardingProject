@@ -31,7 +31,7 @@ struct interface {
 
 void arpPacket(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(struct table tableInfo[7]);
-icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
+void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 
 int main(){
     struct interface interfaces[7];
