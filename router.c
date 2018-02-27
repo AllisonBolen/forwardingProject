@@ -223,6 +223,7 @@ int main(){
           int foundSocket;
           for(x =0; x < 3; x++){
             if(strcmp(name, interfaces[x].name)==0){
+              foundSocket = interfaces[x].socket;
               arpPacketReq(buffer, tableIP, interfaces);
               send(foundSocket, buffer, 42, 0);
             }
