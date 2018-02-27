@@ -28,6 +28,9 @@ struct interface {
       int socket;
 };
 
+struct interface interfaces[7];
+struct table tableInfo[7];
+
 int main(){
     fd_set sockets;
     FD_ZERO(&sockets);
@@ -38,8 +41,6 @@ int main(){
       return 1;
     }
 
-    struct interface interfaces[7];
-    struct table tableInfo[7];
     int count =0;
     int count2 = 0;
     for(tmp = ifaddr; tmp!=NULL; tmp=tmp->ifa_next){
