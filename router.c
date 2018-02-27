@@ -34,12 +34,12 @@ struct message{
   int valid;
   in_addr_t waitingfor;
 };
+
 void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]);
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(struct table tableInfo[7]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 char saveICMPBuffer[1500];
-void saveICMP(char* buf);
 
 int main(){
     struct interface interfaces[7];
@@ -158,7 +158,7 @@ int main(){
           // check if its for me or not if its not for me we forward if
           int n;
           int forus = 0;
-          for(n =0;n < sizeof(interfaces); n++){ // check for if its me
+          for(n =0;n < 7; n++){ // check for if its me
             if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ // if it is do like part one
               forus=1;
               if((ipReq.protocol) == 1){
@@ -179,7 +179,7 @@ int main(){
           in_addr_t tableIP;
           char name[20];
           int k;
-          for(k = 0 ; k < sizeof(tableInfo); k++){
+          for(k = 0 ; k < 7; k++){
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
@@ -207,10 +207,10 @@ int main(){
 
           // store the message
           int m;
-          for(m = 0 ; m < sizeof(storedMessage); m++){
+          for(m = 0 ; m < 100; m++){
             if(storedMessage[m].valid == 0){
               //storedMessage[m].buff = buf;
-	      memcpy(storedMessage[m].buff, buf, 1500);
+	            memcpy(storedMessage[m].buff, buf, 1500);
               storedMessage[m].valid = 1;
               storedMessage[m].waitingfor = tableIP;// address arp is being sent to
             }
@@ -220,7 +220,7 @@ int main(){
           // loop through sockets to find theone to send it on
           int x;
           int foundSocket;
-          for(x =0; x < sizeof(interfaces); x++){
+          for(x =0; x < 7; x++){
             if(strcmp(name, interfaces[x].name)==0){
               arpPacketReq(buffer, tableIP, interfaces);
               send(foundSocket, buffer, 42, 0);
@@ -230,9 +230,9 @@ int main(){
       }
     }
   }
+ }
   freeifaddrs(ifaddr);
   return 0;
-}
 }
 
 // populate table struct
