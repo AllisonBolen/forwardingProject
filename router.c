@@ -106,7 +106,7 @@ int main(){
         //ether header for any packet
         memcpy(&eh,&buf[0],14);
         int type = ntohs(eh.ether_type);
-        printf("should see arp HERE")
+        printf("should see arp HERE");
         if(type == 0x0806){ // got an arp packet
           printf("THIS IS ARP");
           arpPacket(interfaces, eh, buf);
