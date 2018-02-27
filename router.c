@@ -134,7 +134,10 @@ int main(){
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
           // is it a request or a reply
           if((ipReq.protocol) == 1){
-            if(ipReq.type == 8){
+            struct icmphdr icmpReq;
+            memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
+
+            if(icmpReq.type == 8){
               // got an ICMP request packet
               // standin Response
               printf("%s\n", "Received ICMP Request Packet");
@@ -146,7 +149,7 @@ int main(){
               //
               // request an arp on that socket if it matches whats wanted in the ip header target host
             }
-            if(ipReq.type == 0){
+            if(icmpReq.type == 0){
               // got a ICMP reply
               printf("hit this so we got an icmp packet reply.");
             }
