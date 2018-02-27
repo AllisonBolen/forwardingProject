@@ -99,18 +99,18 @@ int main(){
         if(FD_ISSET(i,&tmp_set)){
         int n = recvfrom(i, buf, 1500,0,(struct sockaddr*)&recvaddr, &recvaddrlen);
         printf("THIS IS BEFORE WE CHECK FOR ARP AND ICMP.");
-          if(recvaddr.sll_pkttype==PACKET_OUTGOING){
-            continue;
-          }
-          struct ether_header eh;
-          //ether header for any packet
-          memcpy(&eh,&buf[0],14);
-          int type = ntohs(eh.ether_type);
-
-          if(type == 0x0806){ // got an arp packet
-            printf("THIS IS ARP");
-            arpPacket(interfaces, eh, buf);
-            send(i, buf, 42, 0);// send the arp
+        if(recvaddr.sll_pkttype==PACKET_OUTGOING){
+          continue;
+        }
+        struct ether_header eh;
+        //ether header for any packet
+        memcpy(&eh,&buf[0],14);
+        int type = ntohs(eh.ether_type);
+        printf("should see arp HERE")
+        if(type == 0x0806){ // got an arp packet
+          printf("THIS IS ARP");
+          arpPacket(interfaces, eh, buf);
+          send(i, buf, 42, 0);// send the arp
         }
         printf("THIS IS A PROBLEM HERE");
         if(type == ETHERTYPE_IP){ // got an icmp packet
@@ -161,6 +161,7 @@ int main(){
   freeifaddrs(ifaddr);
   return 0;
 }
+
 // populate table struct
 void readFiles(struct table tableInfo[7]){
     printf("here2\n");
