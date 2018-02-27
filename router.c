@@ -134,7 +134,7 @@ int main(){
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
           // is it a request or a reply
           if((ipReq.protocol) == 1){
-            if(ipreq.type == 8){
+            if(ipReq.type == 8){
               // got an ICMP request packet
               // standin Response
               printf("%s\n", "Received ICMP Request Packet");
