@@ -193,7 +193,7 @@ int main(){
 void readFiles(struct table *tableEle){
     printf("here2\n");
     char filename[12];
-    fgets(filename, 12, stdin);
+    fgets(filename, 13, stdin);
     printf("\nfilename: %s\n", filename);
     FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
