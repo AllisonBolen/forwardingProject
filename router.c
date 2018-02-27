@@ -29,7 +29,13 @@ struct interface {
       int socket;
 };
 
-void arpPacket(struct interface interfaces[], struct ether_header eh, char *buf);
+struct message{
+  char buff[1500];
+  int valid;
+  in_addr_t waitingfor;
+};
+
+void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(struct table tableInfo[7]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 char saveICMPBuffer[1500];
@@ -38,6 +44,7 @@ void saveICMP(char* buf);
 int main(){
     struct interface interfaces[7];
     struct table tableInfo[7];
+    struct message storedMessage[100];
     fd_set sockets;
     FD_ZERO(&sockets);
     int packet_socket;
@@ -83,7 +90,7 @@ int main(){
       }
     }
 
-      readFiles(tableInfo);
+    readFiles(tableInfo);
 
     printf("Ready to recieve now\n");
     while(1){
@@ -113,19 +120,31 @@ int main(){
           if(ntohs(arpReq.ea_hdr.ar_op)== 1){
             // we got a Request
             //respond to said request because you are the only one who can see it
-            arpPacket(interfaces, eh, buf);
+            arpPacketResp(interfaces, eh, buf);
             send(i, buf, 42, 0);
           }
           if(ntohs(arpReq.ea_hdr.ar_op)==2){
             // we got a Response
-            // send data to the ting that we got a response from
+            // send data to the thing that we got a response from
+            struct iphdr ipReq;
+            struct ether_header sendEh;
+            // switch the data in the stored message packet thats being sent
+            int y;
+            for(y = 0; y < 100; y++){
+              if(storedMessage[y].valid == 1){
+                memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
+                memcpy(&ipReq, &storedMessage[y].buff[sizeof(struct ether_header)], sizeof(struct iphdr)); //from the adta packet
+                if(memcmp(arpReq.spa, storedMessage[y].waitingfor)==0){
+                  // switch the source to r1 and add the mac of the arp resp to teh message packt
+                  memcpy(&sendEh,&storedMessage[y].buff[0],14);
+                  memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
+                  memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
+                  memcpy(&storedMessage[y].buff[0], &sendEh[0],14); //reset the biffer to be sents header.
+                  send(i, storedMessage[y].buff, 98, 0); // how and when do I store a message?
+                  storedMessage[y].valid = 0;
+              }
+            }
           }
-          //is this arp for the router?
-
-          // checkdestination(buf);
-
-          // arpPacket(interfaces, eh, buf);
-          // send(i, buf, 42, 0);// send the arp
         }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
@@ -135,31 +154,74 @@ int main(){
           //struct ether_header ethHdr;
           struct ether_header ethResp;
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
-          // is it a request or a reply
-          if((ipReq.protocol) == 1){
-            struct icmphdr icmpReq;
-            memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
-
-            if(icmpReq.type == 8){
-              // got an ICMP request packet
-              // standin Response
-              printf("%s\n", "Received ICMP Request Packet");
-              icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
-              send(i,buf, 98, 0);
-    		      printf("%s\n", "Sending ICMP Response");
-              // this is where we need to find what the destination is and send it off to that one
-              // store the icmp stuff in a buffer array
-              //
-              // request an arp on that socket if it matches whats wanted in the ip header target host
-            }
-            if(icmpReq.type == 0){
-              // got a ICMP reply
-              printf("hit this so we got an icmp packet reply.\n");
+          // check if its for me or not if its not for me we forward if
+          int n;
+          int forus = 0;
+          for(n =0;n < sizeof(interfaces); n++){ // check for if its me
+            if(memcmp(ipReq.daddr, interfaces[n].ip) == 0){ // if it is do like part one
+              forus=1;
+              if((ipReq.protocol) == 1){
+                struct icmphdr icmpReq;
+                memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
+                if(icmpReq.type == 8){
+                  // got an ICMP request packet
+                  printf("%s\n", "Received ICMP Request Packet");
+                  icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
+                  send(i,buf, 98, 0);
+        		      printf("%s\n", "Sending ICMP Response");
+              }
             }
           }
-          else{
-            // we just got an ip packet make sure to forward it or ignore it? not sure????
-            printf("hit the else so we didnt get an icmp packet but it was an IP packet\n.");
+        }
+        if(forus==0){
+          // table look up
+          in_addr_t tableIP;
+          char name[20];
+          int k;
+          for(k = 0 ; k < sizeof(tableInfo); k++){
+            // sepreate on slash
+            //10.0.0.0/16 total lenght 11
+            char byteCmp[3];
+            memcpy(&byteCmp, tableinfo[k].prefix[10],2); //print these at some point
+            char tablePrefIP[9];
+            memcpy(&tablePrefIP, tableInfo[k].prefix[0],8);
+            in_addr_t IPNum = inet_addr(tablePrefIP);//
+            int compare = atoi(byteCmp);
+            int bytenum = compare/8;
+            // get addres form packet
+            in_addr_t fromPacket;
+            memcpy(&fromPacket, &ipReq.daddr, 4);
+            int matches = memcmp(&fromPacket, &IPNum, bytenum);
+            if(matches==0){
+              if(strcmp(tableInfo[count].ip, "-") != 0){
+                tableIP = inet_addr(tableInfo[k].ip);
+                strcpy(name, tableInfo[count].name);
+              }
+              else{
+                tableIP = fromPacket;
+                strcpy(name, tableInfo[count].name);
+              }
+            }
+          }
+          // store the message
+          int m;
+          for(m = 0 ; m < sizeof(storedMessage); m++){
+            if(storedMessage[m].valid == 0){
+              storedMessage[m].buff = buf;
+              storedMessage[m].valid = 1;
+              storedMessage[m].waitingfor = tableIP;// address arp is being sent to
+            }
+          }
+          char buffer[1500];
+          // sends message
+          // loop through sockets to find theone to send it on
+          int x;
+          int foundSocket;
+          for(x =0; x < sizeof(interfaces); x++){
+            if(strcmp(name, interfaces[x].name)==0){
+              arpPacketReq(char* buffer, interfaces, tableIP);
+              send(foundSocket, buffer, 42, 0);
+            }
           }
         }
       }
@@ -168,22 +230,6 @@ int main(){
   freeifaddrs(ifaddr);
   return 0;
 }
-// return one if its the destiontion of the router
-// int checkdestination(buf, struct interface intefaces[]){
-//   struct ether_header ethReq;
-//   memcpy(&ethReq, &buf[0], 14);
-//   int i;
-//   for(i = 0 ; i < sizeof(interfaces); i++){
-//     if(memcmp(ethReq.ether_dhost==interfaces[i].MAC)){// may have an issue
-//
-//     }
-//   }
-// }
-
-// check the prefix for the next thing if its
-// int checkRouteNext(buf){
-//
-// }
 
 // populate table struct
 void readFiles(struct table tableInfo[7]){
@@ -204,11 +250,7 @@ void readFiles(struct table tableInfo[7]){
       while(fscanf(fptr, "%s %s %s", pref, ipaddr, name) != EOF){
         tableInfo[count].name = strdup(name);
         tableInfo[count].prefix = strdup(pref);
-        //if(strcmp(ipaddr, "-") != 0){
-          // in_addr_t actualIPaddr = inet_addr(ipaddr);
-          // memcpy(tableInfo[count].ip,&actualIPaddr,4);
         tableInfo[count].ip = strdup(ipaddr);
-        //}
         printf("\nthis is that table name at count: %s\n ", tableInfo[count].name);
         count ++;
       }
@@ -216,7 +258,39 @@ void readFiles(struct table tableInfo[7]){
     fclose(fptr);
   }
 
-  void arpPacket(struct interface interfaces[], struct ether_header eh, char *buf){
+void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[], struct ether_header eh){
+    printf("Setting up an ARP Request\n");
+    //build the response for arp
+    struct ether_header ethHdrResp;
+    struct ether_arp arpReq;
+    int j;
+    for(j = 0; j< 20; j++){
+      if(memcmp(interfaces[j].IP, tableIP, 4) == 0){
+          memcpy(&arpReq.arp_sha, &interfaces[j].MAC, 6); // get my mac and make the new source
+      }
+    }
+    memcpy(&arpReq.arp_tpa, &tableIP, 4);  // switch ips // should be what we want
+    //memcpy(&arpReq.arp_spa, tableIP, 4); //switch ips // source should be the router address
+    arpReq.ea_hdr.ar_op = htons(1); // change op code for r
+    arpReq.ea_hdr.ar_pro = htons(ETHERTYPE_IP);
+    arpReq.ea_hdr.ar_hln = 6;
+    arpReq.ea_hdr.ar_pln = 4;
+    arpReq.ea_hdr.ar_hrd = htons(1);
+    // change ehternet header
+    int u;
+    for(u = 0; u <6; u++){
+
+    }
+
+    memcpy(&ethHdrResp.ether_shost, &arpReq.arp_sha, 6);// get mac of me to them
+    memcpy(&ethHdrResp.ether_dhost, , 6);// set this to the broadcast
+    ethHdrResp.ether_type = ARP;
+      // fill the buffer
+    memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
+    memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
+  }
+
+void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf){
     printf("Got an ARP PACKET\n");
     //build the response for arp
     struct ether_header ethHdrResp;
@@ -280,9 +354,4 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
   memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
-}
-
-void saveICMP(char *buf){
-  memcpy(saveICMPBuffer, buf, sizeof(saveICMPBuffer));
-  //printf("%s\n", saveICMPBuffer);
 }
