@@ -3,6 +3,7 @@
 #include <net/ethernet.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
