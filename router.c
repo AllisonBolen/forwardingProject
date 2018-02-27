@@ -85,6 +85,7 @@ int main(){
 
       readFiles(tableInfo);
       printf("table info: %s\n", tableInfo[0].name);
+      printf("table info: %s\n", tableInfo[0].prefix);
     // }
 
 
