@@ -42,8 +42,8 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
 char saveICMPBuffer[1500];
 
 int main(){
-    struct interface interfaces[3];
-    struct table tableInfo[4];
+    struct interface interfaces[7];
+    struct table tableInfo[7];
     struct message storedMessage[100];
     fd_set sockets;
     FD_ZERO(&sockets);
@@ -158,7 +158,7 @@ int main(){
           // check if its for me or not if its not for me we forward if
           int n;
           int forus = 0;
-          for(n =0;n < 3; n++){ // check for if its me
+          for(n =0;n < 7; n++){ // check for if its me
             if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ // if it is do like part one
               forus=1;
               if((ipReq.protocol) == 1){
@@ -179,7 +179,7 @@ int main(){
           in_addr_t tableIP;
           char name[20];
           int k;
-          for(k = 0 ; k < 4; k++){
+          for(k = 0 ; k < 7; k++){
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
@@ -221,7 +221,7 @@ int main(){
           // loop through sockets to find theone to send it on
           int x;
           int foundSocket;
-          for(x =0; x < 3; x++){
+          for(x =0; x < 7; x++){
             if(strcmp(name, interfaces[x].name)==0){
               foundSocket = interfaces[x].socket;
               arpPacketReq(buffer, tableIP, interfaces);
@@ -270,7 +270,7 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     struct ether_header ethHdrResp;
     struct ether_arp arpReq;
     int j;
-    for(j = 0; j< 20; j++){
+    for(j = 0; j< 7; j++){
       if(memcmp(&interfaces[j].IP, &tableIP, 4) == 0){
           memcpy(&arpReq.arp_sha, &interfaces[j].MAC, 6); // get my mac and make the new source
       }
@@ -309,7 +309,7 @@ void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *
     int j;
     u_char wantedIp[4];
     memcpy(&wantedIp[0],arpReq.arp_tpa,4);
-    for(j = 0; j< 20; j++){
+    for(j = 0; j< 7; j++){
       if(memcmp(interfaces[j].IP, wantedIp, 4) == 0){
           memcpy(&arpResp.arp_sha, &interfaces[j].MAC, 6); // get mmy mac and make the new source
       }
