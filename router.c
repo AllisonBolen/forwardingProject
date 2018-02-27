@@ -30,7 +30,7 @@ struct interface {
       int socket;
 };
 
-void readFiles(struct table *tableEle);
+void readFiles(struct table tableInfo[]);
 int main(){
     struct interface interfaces[7];
     struct table tableInfo[7];
@@ -79,12 +79,13 @@ int main(){
       }
     }
 
-    int j;
-    for(j = 0; j < sizeof(tableInfo); j++){
-      printf("\nhere1\n");
+    // int j;
+    // for(j = 0; j < sizeof(tableInfo); j++){
+    //   printf("\nhere1\n");
 
-      readFiles( (&tableInfo)[j]);
-    }
+      readFiles(&tableInfo);
+      printf("table info: %s\n", tableInfo[0].name);
+    // }
 
 
     printf("Ready to recieve now\n");
@@ -190,7 +191,7 @@ int main(){
     return 0;
 }
 // populate table struct
-void readFiles(struct table *tableEle){
+void readFiles(struct table tableInfo[]){
     printf("here2\n");
     char filename[12];
     fgets(filename, 13, stdin);
@@ -206,13 +207,13 @@ void readFiles(struct table *tableEle){
       int count = 0;
       char pref[10], ipaddr[10], name[10];
       while(fscanf(fptr, "%s %s %s", pref, ipaddr, name) != EOF){
-        tableEle[count].name = strdup(name);
-        tableEle[count].prefix = strdup(pref);
+        tableInfo[count].name = strdup(name);
+        tableInfo[count].prefix = strdup(pref);
         if(strcmp(ipaddr, "-") != 0){
           in_addr_t actualIPaddr = inet_addr(ipaddr);
-          memcpy(tableEle[count].ip,&actualIPaddr,4);
+          memcpy(tableInfo[count].ip,&actualIPaddr,4);
         }
-        printf("\nthis is that table name at count: %s\n ", tableEle[count].name);
+        printf("\nthis is that table name at count: %s\n ", tableInfo[count].name);
         count ++;
       }
     }
