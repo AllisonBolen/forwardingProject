@@ -211,7 +211,7 @@ void readFiles(struct table *tableEle){
           in_addr_t actualIPaddr = inet_addr(ipaddr);
           memcpy(tableEle[count].ip,&actualIPaddr,4);
         }
-        print("\nthis is that table name at count: %s\n ", tableEle[count].name);
+        printf("\nthis is that table name at count: %s\n ", tableEle[count].name);
         count ++;
       }
     }
