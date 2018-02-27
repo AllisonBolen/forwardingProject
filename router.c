@@ -158,7 +158,7 @@ int main(){
           int n;
           int forus = 0;
           for(n =0;n < sizeof(interfaces); n++){ // check for if its me
-            if(memcmp(ipReq.daddr, interfaces[n].ip, 4) == 0){ // if it is do like part one
+            if(memcmp(ipReq.daddr, interfaces[n].IP, 4) == 0){ // if it is do like part one
               forus=1;
               if((ipReq.protocol) == 1){
                 struct icmphdr icmpReq;
