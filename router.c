@@ -219,7 +219,7 @@ int main(){
           int foundSocket;
           for(x =0; x < sizeof(interfaces); x++){
             if(strcmp(name, interfaces[x].name)==0){
-              arpPacketReq(char* buffer, interfaces, tableIP);
+              arpPacketReq(char* buffer, tableIP, interfaces);
               send(foundSocket, buffer, 42, 0);
             }
           }
@@ -258,7 +258,7 @@ void readFiles(struct table tableInfo[7]){
     fclose(fptr);
   }
 
-void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[], struct ether_header eh){
+void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     printf("Setting up an ARP Request\n");
     //build the response for arp
     struct ether_header ethHdrResp;
@@ -278,13 +278,15 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[], s
     arpReq.ea_hdr.ar_hrd = htons(1);
     // change ehternet header
     int u;
-    for(u = 0; u <6; u++){
-
+    uint8_t broadcast[6];
+    char* f = "FF";
+    for(u = 0; u < 6; u++){
+      memcpy(&broadcast, &f[0], 2);
     }
 
     memcpy(&ethHdrResp.ether_shost, &arpReq.arp_sha, 6);// get mac of me to them
-    memcpy(&ethHdrResp.ether_dhost, , 6);// set this to the broadcast
-    ethHdrResp.ether_type = ARP;
+    memcpy(&ethHdrResp.ether_dhost, broadcast, 6);// set this to the broadcast
+    ethHdrResp.ether_type = htons(0x0806);
       // fill the buffer
     memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
     memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
