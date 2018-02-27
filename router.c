@@ -146,6 +146,7 @@ int main(){
             }
           }
         }
+      }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
   	      printf("%s\n", "Received IP Packet");
@@ -182,9 +183,9 @@ int main(){
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
-            memcpy(&byteCmp, tableinfo[k].prefix[10],2); //print these at some point
+            memcpy(&byteCmp, &tableInfo[k].prefix[10],2); //print these at some point
             char tablePrefIP[9];
-            memcpy(&tablePrefIP, tableInfo[k].prefix[0],8);
+            memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
             in_addr_t IPNum = inet_addr(tablePrefIP);//
             int compare = atoi(byteCmp);
             int bytenum = compare/8;
@@ -203,11 +204,13 @@ int main(){
               }
             }
           }
+	}
           // store the message
           int m;
           for(m = 0 ; m < sizeof(storedMessage); m++){
             if(storedMessage[m].valid == 0){
-              storedMessage[m].buff = buf;
+              //storedMessage[m].buff = buf;
+	      memcpy(storedMessage[m].buff, buf, 1500);
               storedMessage[m].valid = 1;
               storedMessage[m].waitingfor = tableIP;// address arp is being sent to
             }
@@ -219,16 +222,17 @@ int main(){
           int foundSocket;
           for(x =0; x < sizeof(interfaces); x++){
             if(strcmp(name, interfaces[x].name)==0){
-              arpPacketReq(char* buffer, tableIP, interfaces);
+              arpPacketReq(buffer, tableIP, interfaces);
               send(foundSocket, buffer, 42, 0);
             }
           }
         }
       }
     }
-  }
+
   freeifaddrs(ifaddr);
   return 0;
+}
 }
 
 // populate table struct
@@ -289,7 +293,7 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     ethHdrResp.ether_type = htons(0x0806);
       // fill the buffer
     memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
-    memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
+    memcpy(&buf[sizeof(struct ether_header)], &arpReq, sizeof(struct ether_arp));
   }
 
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf){
