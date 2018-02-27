@@ -122,7 +122,7 @@ int main(){
           struct ether_header ethResp;
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
           if((ipReq.protocol) == 1){
-            icmpPacket(interfaces, eh, buf);
+            icmpPacket(interfaces, eh, buf, ethResp, ipResp);
             send(i,buf, 98, 0);
   		      printf("%s\n", "Sending ICMP Response");
           }
@@ -198,7 +198,7 @@ void readFiles(struct table tableInfo[7]){
     memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
   }
 
-icmpPacket(struct interface interfaces[], struct ether_header eh, char *buf){
+icmpPacket(struct interface interfaces[], struct ether_header ethResp, struct iphdr ipResp, char *buf){
   struct icmphdr icmpReq;
   struct icmphdr icmpResp;
   memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
