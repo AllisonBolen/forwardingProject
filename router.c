@@ -190,8 +190,8 @@ int main(){
 // populate table struct
 void readFiles(struct table *tableEle){
     printf("here2");
-    char* filename[12];
-    fgets(filename, 12, stdin);
+    char *filename[12];
+    fgets(*filename, 12, stdin);
     FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
     {
