@@ -139,7 +139,7 @@ int main(){
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
                   memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
-                  memcpy(storedMessage[y].buff[0], sendEh[0],14); //reset the biffer to be sents header.
+                  memcpy(&storedMessage[y].buff[0], &sendEh,14); //reset the biffer to be sents header.
                   send(i, storedMessage[y].buff, 98, 0); // how and when do I store a message?
                   storedMessage[y].valid = 0;
               }
