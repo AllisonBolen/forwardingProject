@@ -110,6 +110,10 @@ int main(){
 
         if(type == 0x0806){ // got an arp packet
           printf("THIS IS ARP");
+          //is this arp for the router?
+          checkdestination(buf);
+
+
           arpPacket(interfaces, eh, buf);
           send(i, buf, 42, 0);// send the arp
         }
@@ -132,6 +136,14 @@ int main(){
   }
   freeifaddrs(ifaddr);
   return 0;
+}
+
+void checkdestination(buf){
+
+}
+
+void checkRouteNext(buf){
+
 }
 
 // populate table struct
