@@ -134,7 +134,7 @@ int main(){
               if(storedMessage[y].valid == 1){
                 memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
                 memcpy(&ipReq, &storedMessage[y].buff[sizeof(struct ether_header)], sizeof(struct iphdr)); //from the adta packet
-                if(memcmp(&arpReq.spa, &storedMessage[y].waitingfor, 4)==0){
+                if(memcmp(&arpReq.arp_spa, &storedMessage[y].waitingfor, 4)==0){
                   // switch the source to r1 and add the mac of the arp resp to teh message packt
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
@@ -279,13 +279,13 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     // change ehternet header
     int u;
     uint8_t broadcast[6];
-    char* f = "FF";
+    char f = 0xFF;
     for(u = 0; u < 6; u++){
-      memcpy(&broadcast, &f[0], 2);
+      broadcast[u]=f;
     }
 
     memcpy(&ethHdrResp.ether_shost, &arpReq.arp_sha, 6);// get mac of me to them
-    memcpy(&ethHdrResp.ether_dhost, broadcast, 6);// set this to the broadcast
+    memcpy(&ethHdrResp.ether_dhost, &broadcast, 6);// set this to the broadcast
     ethHdrResp.ether_type = htons(0x0806);
       // fill the buffer
     memcpy(&buf[0], &ethHdrResp, sizeof(struct ether_header));
