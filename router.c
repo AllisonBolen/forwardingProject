@@ -16,8 +16,6 @@
 //noice
 //Allison Bolen, Cade Baker, Andy Hung
 
-
-
 struct table {
       char* ip;
       char* prefix;
@@ -82,10 +80,10 @@ int main(){
 
       readFiles(tableInfo);
       int i = 0;
-      for (i = 0 ; i < sizeof(tableInfo); i++){
+      for (i = 0 ; i < 3; i++){
         printf("table info: %s\n", tableInfo[i].name);
         printf("table info: %s\n", tableInfo[i].prefix);
-        printf("table info: %s\n", tableInfo[i].ip);
+        //printf("table info: %s\n", tableInfo[i].ip);
       }
 
     printf("Ready to recieve now\n");
