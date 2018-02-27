@@ -115,27 +115,46 @@ int main(){
           }
           if(arpReq.ea_hdr.ar_op==2){
             // we got a Response
-
+            // send data to the ting that we got a response from
           }
           //is this arp for the router?
 
           // checkdestination(buf);
 
-          arpPacket(interfaces, eh, buf);
-          send(i, buf, 42, 0);// send the arp
+          // arpPacket(interfaces, eh, buf);
+          // send(i, buf, 42, 0);// send the arp
         }
 
         if(type == ETHERTYPE_IP){ // got an icmp packet
-  	      printf("%s\n", "Received ICMP Request Packet");
+  	      printf("%s\n", "Received IP Packet");
           struct iphdr ipReq;
           struct iphdr ipResp;
           //struct ether_header ethHdr;
           struct ether_header ethResp;
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
+          // is it a request or a reply
           if((ipReq.protocol) == 1){
-            icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
-            send(i,buf, 98, 0);
-  		      printf("%s\n", "Sending ICMP Response");
+            if(ipreq.type == 8){
+              // got an ICMP request packet
+              // standin Response
+              printf("%s\n", "Received ICMP Request Packet");
+              icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
+              send(i,buf, 98, 0);
+    		      printf("%s\n", "Sending ICMP Response");
+              // this is where we need to find what the destination is and send it off to that one
+              // store the icmp stuff in a buffer array
+              //
+              // request an arp on that socket if it matches whats wanted in the ip header target host
+            }
+            if(ipReq.type == 0){
+              // got a ICMP reply
+              printf("hit this so we got an icmp packet reply.");
+            }
+
+          }
+          else{
+            // we just got an ip packet make sure to forward it or ignore it? not sure????
+            printf("hit the else so we didnt get an icmp packet.");
           }
         }
       }
