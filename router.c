@@ -134,7 +134,7 @@ int main(){
               if(storedMessage[y].valid == 1){
                 memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
                 memcpy(&ipReq, &storedMessage[y].buff[sizeof(struct ether_header)], sizeof(struct iphdr)); //from the adta packet
-                if(memcmp(arpReq.spa, storedMessage[y].waitingfor)==0){
+                if(memcmp(&arpReq.spa, &storedMessage[y].waitingfor)==0){
                   // switch the source to r1 and add the mac of the arp resp to teh message packt
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
