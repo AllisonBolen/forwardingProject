@@ -151,13 +151,12 @@ int main(){
             }
             if(icmpReq.type == 0){
               // got a ICMP reply
-              printf("hit this so we got an icmp packet reply.");
+              printf("hit this so we got an icmp packet reply.\n");
             }
-
           }
           else{
             // we just got an ip packet make sure to forward it or ignore it? not sure????
-            printf("hit the else so we didnt get an icmp packet.");
+            printf("hit the else so we didnt get an icmp packet but it was an IP packet\n.");
           }
         }
       }
