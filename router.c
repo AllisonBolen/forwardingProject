@@ -105,8 +105,9 @@ int main(){
           //ether header for any packet
           memcpy(&eh,&buf[0],14);
           int type = ntohs(eh.ether_type);
-
+          printf("THIS IS BEFORE WE CHECK FOR ARP AND ICMP.");
           if(type == 0x0806){ // got an arp packet
+            printf("THIS IS ARP");
             arpPacket(interfaces, eh, buf);
             // printf("got a packet in arp\n");
             // //build the response for arp
@@ -140,6 +141,7 @@ int main(){
             // memcpy(&buf[sizeof(struct ether_header)], &arpResp, sizeof(struct ether_arp));
             send(i, buf, 42, 0);// send the arp
         }
+        printf("THIS IS A PROBLEM HERE")
         if(type == ETHERTYPE_IP){ // got an icmp packet
   	      printf("%s\n", "Received ICMP Request Packet");
           struct iphdr ipReq;
