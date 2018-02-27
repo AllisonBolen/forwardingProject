@@ -30,7 +30,7 @@ struct interface {
       int socket;
 };
 
-void readFiles(struct table tableInfo[]);
+void readFiles(struct table tableInfo[7]);
 int main(){
     struct interface interfaces[7];
     struct table tableInfo[7];
@@ -83,7 +83,7 @@ int main(){
     // for(j = 0; j < sizeof(tableInfo); j++){
     //   printf("\nhere1\n");
 
-      readFiles(&tableInfo);
+      readFiles(tableInfo);
       printf("table info: %s\n", tableInfo[0].name);
     // }
 
@@ -191,7 +191,7 @@ int main(){
     return 0;
 }
 // populate table struct
-void readFiles(struct table tableInfo[]){
+void readFiles(struct table tableInfo[7]){
     printf("here2\n");
     char filename[12];
     fgets(filename, 13, stdin);
