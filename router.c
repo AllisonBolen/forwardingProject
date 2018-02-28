@@ -153,7 +153,6 @@ int main(){
             // switch the data in the stored message packet thats being sent
             int y;
             for(y = 0; y < 100; y++){
-              printf("\n\nFUCKKKKKKKKKKKKKKKKKK\n\n");
               if(storedMessage[y].valid == 1){
                 memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
                 memcpy(&ipReq, &storedMessage[y].buff[sizeof(struct ether_header)], sizeof(struct iphdr)); //from the adta packet
@@ -247,7 +246,6 @@ int main(){
           for(m = 0 ; m < 100; m++){
             if(storedMessage[m].valid == 0){
               //storedMessage[m].buff = buf;
-              printf("\n\n\nSHIIIIIIIIIITTTTT\n\n");
 	            memcpy(storedMessage[m].buff, buf, 1500);
               storedMessage[m].valid = 1;
               storedMessage[m].waitingfor = tableIP;// address arp is being sent to
