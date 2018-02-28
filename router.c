@@ -206,8 +206,10 @@ int main(){
             char byteCmp[3];
             printf("\nIm Here right now\n");
             memcpy(&byteCmp, &tableInfo[k].prefix[10],2); //print these at some point
+            printf("this is the prefix string: %s\n", byteCmp );
             char tablePrefIP[9];
             memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
+            printf("this is the stuff for the ip preix: %s\n",tablePrefIP );
             in_addr_t IPNum = inet_addr(tablePrefIP);//
             int compare = atoi(byteCmp);
             int bytenum = compare/8;
@@ -245,7 +247,8 @@ int main(){
           for(x =0; x < numInterfaces; x++){
             if(strcmp(name, interfaces[x].name)==0){
               foundSocket = interfaces[x].socket;
-              printf("%s", inet_ntoa(tableIP));
+              char * z = inet_ntoa(*(struct in_addr *)&tableIP);
+              printf("%s\n", z);
               arpPacketReq(buffer, tableIP, interfaces);
               send(foundSocket, buffer, 42, 0);
             }
