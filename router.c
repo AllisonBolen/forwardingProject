@@ -205,7 +205,6 @@ int main(){
           in_addr_t fromPacket;
           memcpy(&fromPacket, &ipReq.daddr, 4);
           for(k = 0 ; k < numTable; k++){
-            printf()
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
