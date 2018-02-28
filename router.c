@@ -147,6 +147,7 @@ int main(){
           if(ntohs(arpReq.ea_hdr.ar_op)==2){
             // we got a Response
             // send data to the thing that we got a response from
+            printf("\n\nTHIS IS Response for the furthest host\n");
             struct iphdr ipReq;
             struct ether_header sendEh;
             // switch the data in the stored message packet thats being sent
@@ -157,6 +158,7 @@ int main(){
                 memcpy(&ipReq, &storedMessage[y].buff[sizeof(struct ether_header)], sizeof(struct iphdr)); //from the adta packet
                 if(memcmp(&arpReq.arp_spa, &storedMessage[y].waitingfor, 4)==0){
                   // switch the source to r1 and add the mac of the arp resp to teh message packt
+                  printf("SENT THE STORED PACKET TO THE DESTINATION\n");
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
                   memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
