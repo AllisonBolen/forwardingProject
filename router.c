@@ -323,7 +323,7 @@ void arpPacketReq(char *buf, in_addr_t tableIP, char* name, struct interface int
     for(j = 0; j< numInterfaces; j++){
       int check = memcmp(&interfaces[j].IP, &tableIP, 4);
       printf("Memory Compare Result: %d\n", check);
-      if(strcmp(&interfaces[j].name, &name) == 0){
+      if(strcmp(interfaces[j].name, name) == 0){
 	        printf("Entered Interface IF: %s\n", interfaces[j].name);
           memcpy(&arpReq.arp_sha, &interfaces[j].MAC, 6); // get my mac and make the new source
 	        memcpy(&arpReq.arp_spa, &interfaces[j].IP, 4);
