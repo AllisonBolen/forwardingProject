@@ -35,7 +35,7 @@ struct message{
   in_addr_t waitingfor;
 };
 
-void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]);
+void arpPacketReq(char *buf, in_addr_t tableIP, char* name, struct interface interfaces[]);
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(char* filename, struct table tableInfo[4]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
@@ -205,10 +205,10 @@ int main(){
           in_addr_t fromPacket;
           memcpy(&fromPacket, &ipReq.daddr, 4);
           for(k = 0 ; k < numTable; k++){
+            printf()
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
-            printf("\nIm Here right now\n");
             memcpy(&byteCmp, &tableInfo[k].prefix[9], 2); //print these at some point
             //printf("this is the prefix string: %s\n", byteCmp );
             char tablePrefIP[9];
@@ -265,7 +265,7 @@ int main(){
               foundSocket = interfaces[x].socket;
               char * z = inet_ntoa(*(struct in_addr *)&tableIP);
               printf("%s\n", z);
-              arpPacketReq(buffer, tableIP, interfaces);
+              arpPacketReq(buffer, tableIP, name, interfaces);
               send(foundSocket, buffer, 42, 0);
               printf("HERE WE SENT THE ARP for teh destination\n" );
             }
@@ -306,7 +306,7 @@ void readFiles( char* filename,struct table tableInfo[numTable]){
     fclose(fptr);
   }
 
-void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
+void arpPacketReq(char *buf, in_addr_t tableIP, char* name, struct interface interfaces[]){
     printf("Setting up an ARP Request\n");
     char * z = inet_ntoa(*(struct in_addr *)&tableIP);
               printf("Table IP Address in ARPPACKETREQ: %s\n", z);
@@ -323,10 +323,10 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     for(j = 0; j< numInterfaces; j++){
       int check = memcmp(&interfaces[j].IP, &tableIP, 4);
       printf("Memory Compare Result: %d\n", check);
-      if(memcmp(&interfaces[j].IP, &tableIP, 4) == 0){
-	  printf("Entered Interface IF: %s\n", interfaces[j].name);
+      if(strcmp(&interfaces[j].name, &name) == 0){
+	        printf("Entered Interface IF: %s\n", interfaces[j].name);
           memcpy(&arpReq.arp_sha, &interfaces[j].MAC, 6); // get my mac and make the new source
-	  memcpy(&arpReq.arp_spa, &interfaces[j].IP, 4);
+	        memcpy(&arpReq.arp_spa, &interfaces[j].IP, 4);
       }
     }
     memcpy(&arpReq.arp_tpa, &tableIP, 4);  // switch ips // should be what we want
