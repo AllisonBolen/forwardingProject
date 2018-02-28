@@ -410,7 +410,7 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
 }
 
-void cksum(u_short *buf, int count){
+u_short cksum(u_short *buf, int count){
   register u_long sum = 0;
   while(count--){
     sum += *buf++;
