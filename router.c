@@ -37,7 +37,7 @@ struct message{
 
 void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]);
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
-void readFiles(struct table tableInfo[4]);
+void readFiles(char* filename, struct table tableInfo[4]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 int numInterfaces = 0;
 int numTable = 0;
@@ -45,8 +45,8 @@ int numTable = 0;
 
 int main(){
     //ask for user input
-    printf("Please enter a table name to read from:\n %s", filename);
     char filename[12];
+    printf("Please enter a table name to read from:\n");
     fgets(filename, 13, stdin);
     if(strcmp(filename, "r1-table.txt")==0){
       numTable = 4;
@@ -111,7 +111,7 @@ int main(){
       }
     }
 
-    // readFiles(tableInfo);
+    readFiles(filename, tableInfo);
 
     printf("Ready to recieve now\n");
     while(1){
