@@ -245,6 +245,7 @@ int main(){
           for(x =0; x < numInterfaces; x++){
             if(strcmp(name, interfaces[x].name)==0){
               foundSocket = interfaces[x].socket;
+              printf("%s", inet_ntoa(tableIP));
               arpPacketReq(buffer, tableIP, interfaces);
               send(foundSocket, buffer, 42, 0);
             }
