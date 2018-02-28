@@ -195,8 +195,9 @@ int main(){
             }
           }
         }
-        printf("\n\nWe got a packet that isnt meant for us\n");
+
         if(forus==0){
+          printf("\n\nWe got a packet that isnt meant for us\n");
           // table look up
           in_addr_t tableIP;
           char name[20];
@@ -265,7 +266,7 @@ int main(){
               printf("%s\n", z);
               arpPacketReq(buffer, tableIP, interfaces);
               send(foundSocket, buffer, 42, 0);
-              printf("HERE WE SENT THE ARP for teh destination\n", );
+              printf("HERE WE SENT THE ARP for teh destination\n" );
             }
           }
         }
