@@ -247,6 +247,7 @@ int main(){
           for(m = 0 ; m < 100; m++){
             if(storedMessage[m].valid == 0){
               //storedMessage[m].buff = buf;
+              printf("\n\n\nSHIIIIIIIIIITTTTT\n\n");
 	            memcpy(storedMessage[m].buff, buf, 1500);
               storedMessage[m].valid = 1;
               storedMessage[m].waitingfor = tableIP;// address arp is being sent to
