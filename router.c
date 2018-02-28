@@ -35,13 +35,13 @@ struct message{
   in_addr_t waitingfor;
 };
 
+u_short cksum(u_short *buf, int count);
 void arpPacketReq(char *buf, in_addr_t tableIP, char* name, struct interface interfaces[]);
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(char* filename, struct table tableInfo[4]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 int numInterfaces = 0;
 int numTable = 0;
-
 
 int main(){
     //ask for user input
@@ -60,12 +60,11 @@ int main(){
       printf("File not found: %s\n",filename);
       return 0;
     }
-
+    // setup arrays
     struct interface interfaces[numInterfaces];
     struct table tableInfo[numTable];
     struct message storedMessage[100];
-
-
+    // set up sockets
     fd_set sockets;
     FD_ZERO(&sockets);
     int packet_socket;
@@ -75,7 +74,7 @@ int main(){
       return 1;
     }
 
-    int count =0;
+    int count = 0;
     int count2 = 0;
     for(tmp = ifaddr; tmp!=NULL; tmp=tmp->ifa_next){
       if(tmp->ifa_addr->sa_family==AF_PACKET){
@@ -90,6 +89,7 @@ int main(){
         	}
           FD_SET(packet_socket, &sockets);
           struct sockaddr_ll *addrLL;
+          //add data to the interfaces sturctures in the array
           addrLL = (struct sockaddr_ll *)(tmp->ifa_addr);
           printf("\t InterFace MAC: %s\n", ether_ntoa((struct ether_addr*)(addrLL->sll_addr)));
           memcpy(interfaces[count].MAC,addrLL->sll_addr,6);
@@ -159,6 +159,10 @@ int main(){
                 if(memcmp(&arpReq.arp_spa, &storedMessage[y].waitingfor, 4)==0){
                   // switch the source to r1 and add the mac of the arp resp to teh message packt
                   printf("SENT THE STORED PACKET TO THE DESTINATION\n");
+                  // decrement ttl before sending
+                  _u8 dec = 1;
+                  ipReq.ttl = ipReq.ttl - dec; // probably fine ????
+                  memcpy(storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
                   memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
@@ -178,96 +182,100 @@ int main(){
           //struct ether_header ethHdr;
           struct ether_header ethResp;
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
-          // check if its for me or not if its not for me we forward if
-          int n;
-          int forus = 0;
-          for(n =0;n < numInterfaces; n++){ // check for if its me
-            if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ // if it is do like part one
-              forus=1;
-              printf("PACKET FOR THE ROUTER");
-              if((ipReq.protocol) == 1){
-                struct icmphdr icmpReq;
-                memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
-                if(icmpReq.type == 8){
-                  // got an ICMP request packet
-                  printf("%s\n", "Received ICMP Request Packet");
-                  icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
-                  send(i,buf, 98, 0);
-        		      printf("%s\n", "Sending ICMP Response");
+          if(ntohs(ipReq.ttl) > 1 ){ // check the ttl for next hop if it equals one do sending for it
+            // check if its for me or not if its not for me we forward if
+            int n;
+            int forus = 0;
+            for(n =0;n < numInterfaces; n++){ // check for if its me
+              if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ // if it is do like part one
+                forus=1;
+                printf("PACKET FOR THE ROUTER");
+                if((ipReq.protocol) == 1){
+                  struct icmphdr icmpReq;
+                  memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
+                  if(icmpReq.type == 8){
+                    // got an ICMP request packet
+                    printf("%s\n", "Received ICMP Request Packet");
+                    icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
+                    send(i,buf, 98, 0);
+          		      printf("%s\n", "Sending ICMP Response");
+                }
               }
             }
           }
-        }
 
-        if(forus==0){
-          //printf("\n\nWe got a packet that isnt meant for us\n");
-          // table look up
-          in_addr_t tableIP;
-          char name[20];
-          int k;
-          in_addr_t fromPacket;
-          memcpy(&fromPacket, &ipReq.daddr, 4);
-          for(k = 0 ; k < numTable; k++){
-            // sepreate on slash
-            //10.0.0.0/16 total lenght 11
-            char byteCmp[3];
-            memcpy(&byteCmp, &tableInfo[k].prefix[9], 2); //print these at some point
-            //printf("this is the prefix string: %s\n", byteCmp );
-            char tablePrefIP[9];
-            memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
-	          tablePrefIP[8] = '\0';
-            //printf("this is the stuff for the ip preix: %s\n",tablePrefIP );
-            in_addr_t IPNum = inet_addr(tablePrefIP);//
-	          char * y = inet_ntoa(*(struct in_addr *)&IPNum);
-            //printf("IPNum from FORUS=0: %s\n", y);
-            int compare = atoi(byteCmp);
-            int bytenum = compare/8;
-            // get addres form packet
-	          char * t = inet_ntoa(*(struct in_addr *)&IPNum);
-            //printf("FromPacket: %s\n", t);
-            int matches = memcmp(&fromPacket, &IPNum, bytenum);
-	          //printf("Matches Value: %d\n", matches);
-            if(matches==0){
-              if(strcmp(tableInfo[k].ip, "-") != 0){
-                tableIP = inet_addr(tableInfo[k].ip);
-                strcpy(name, tableInfo[k].name);
-		            //printf("this is the stuff for the ip preix: %s\n",tablePrefIP );
-		            //printf("this is the prefix string: %s\n", byteCmp );
-		            //break;
-              }
-              else{
-                tableIP = fromPacket;
-                strcpy(name, tableInfo[k].name);
+          if(forus==0){
+            //printf("\n\nWe got a packet that isnt meant for us\n");
+            // table look up
+            in_addr_t tableIP;
+            char name[20];
+            int k;
+            in_addr_t fromPacket;
+            memcpy(&fromPacket, &ipReq.daddr, 4);
+            for(k = 0 ; k < numTable; k++){
+              // sepreate on slash
+              //10.0.0.0/16 total lenght 11
+              char byteCmp[3];
+              memcpy(&byteCmp, &tableInfo[k].prefix[9], 2); //print these at some point
+              //printf("this is the prefix string: %s\n", byteCmp );
+              char tablePrefIP[9];
+              memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
+  	          tablePrefIP[8] = '\0';
+              //printf("this is the stuff for the ip preix: %s\n",tablePrefIP );
+              in_addr_t IPNum = inet_addr(tablePrefIP);//
+  	          char * y = inet_ntoa(*(struct in_addr *)&IPNum);
+              //printf("IPNum from FORUS=0: %s\n", y);
+              int compare = atoi(byteCmp);
+              int bytenum = compare/8;
+              // get addres form packet
+  	          char * t = inet_ntoa(*(struct in_addr *)&IPNum);
+              //printf("FromPacket: %s\n", t);
+              int matches = memcmp(&fromPacket, &IPNum, bytenum);
+  	          //printf("Matches Value: %d\n", matches);
+              if(matches==0){
+                if(strcmp(tableInfo[k].ip, "-") != 0){
+                  tableIP = inet_addr(tableInfo[k].ip);
+                  strcpy(name, tableInfo[k].name);
+  		            //printf("this is the stuff for the ip preix: %s\n",tablePrefIP );
+  		            //printf("this is the prefix string: %s\n", byteCmp );
+  		            //break;
+                }
+                else{
+                  tableIP = fromPacket;
+                  strcpy(name, tableInfo[k].name);
+                }
               }
             }
-          }
-          // store the message
-          int m;
-          for(m = 0 ; m < 100; m++){
-            if(storedMessage[m].valid == 0){
-              //storedMessage[m].buff = buf;
-	            memcpy(storedMessage[m].buff, buf, 1500);
-              storedMessage[m].valid = 1;
-              storedMessage[m].waitingfor = tableIP;// address arp is being sent to
-              break;
+            // store the message
+            int m;
+            for(m = 0 ; m < 100; m++){
+              if(storedMessage[m].valid == 0){
+                //storedMessage[m].buff = buf;
+  	            memcpy(storedMessage[m].buff, buf, 1500);
+                storedMessage[m].valid = 1;
+                storedMessage[m].waitingfor = tableIP;// address arp is being sent to
+                break;
+              }
             }
-          }
-          char buffer[1500];
-          // sends message
-          // loop through sockets to find theone to send it on
-          int x;
-          int foundSocket;
-          for(x =0; x < numInterfaces; x++){
-            if(strcmp(name, interfaces[x].name)==0){
-              foundSocket = interfaces[x].socket;
-              char * z = inet_ntoa(*(struct in_addr *)&tableIP);
-              printf("%s\n", z);
-              arpPacketReq(buffer, tableIP, name, interfaces);
-              send(foundSocket, buffer, 42, 0);
-              printf("HERE WE SENT THE ARP for the further destination\n" );
+            char buffer[1500];
+            // sends message
+            // loop through sockets to find theone to send it on
+            int x;
+            int foundSocket;
+            for(x =0; x < numInterfaces; x++){
+              if(strcmp(name, interfaces[x].name)==0){
+                foundSocket = interfaces[x].socket;
+                char * z = inet_ntoa(*(struct in_addr *)&tableIP);
+                printf("%s\n", z);
+                arpPacketReq(buffer, tableIP, name, interfaces);
+                send(foundSocket, buffer, 42, 0);
+                printf("HERE WE SENT THE ARP for the further destination\n" );
+              }
             }
           }
         }
+        //else{ // the ttl has is 1 so we should drop the packet / just ignore it
+        //}
       }
     }
   }
