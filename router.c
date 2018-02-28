@@ -39,12 +39,33 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]);
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
 void readFiles(struct table tableInfo[4]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
-char saveICMPBuffer[1500];
+int numInterfaces = 0;
+int numTable = 0;
+
 
 int main(){
-    struct interface interfaces[7];
-    struct table tableInfo[7];
+    //ask for user input
+    printf("Please enter a table name to read from:\n %s", filename);
+    char filename[12];
+    fgets(filename, 13, stdin);
+    if(strcmp(filename, "r1-table.txt")==0){
+      numTable = 4;
+      numInterfaces = 3;
+    }
+    else if(strcmp(filename, "r2-table.txt")==0){
+      numTable = 5;
+      numInterfaces = 4;
+    }
+    else{
+      printf("File not found: %s\n",filename);
+      return 0;
+    }
+
+    struct interface interfaces[numInterfaces];
+    struct table tableInfo[numTable];
     struct message storedMessage[100];
+
+
     fd_set sockets;
     FD_ZERO(&sockets);
     int packet_socket;
@@ -90,7 +111,7 @@ int main(){
       }
     }
 
-    readFiles(tableInfo);
+    // readFiles(tableInfo);
 
     printf("Ready to recieve now\n");
     while(1){
@@ -158,7 +179,7 @@ int main(){
           // check if its for me or not if its not for me we forward if
           int n;
           int forus = 0;
-          for(n =0;n < 7; n++){ // check for if its me
+          for(n =0;n < numInterfaces; n++){ // check for if its me
             if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ // if it is do like part one
               forus=1;
               if((ipReq.protocol) == 1){
@@ -179,7 +200,7 @@ int main(){
           in_addr_t tableIP;
           char name[20];
           int k;
-          for(k = 0 ; k < 4; k++){
+          for(k = 0 ; k < numTable; k++){
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
@@ -221,7 +242,7 @@ int main(){
           // loop through sockets to find theone to send it on
           int x;
           int foundSocket;
-          for(x =0; x < 7; x++){
+          for(x =0; x < numInterfaces; x++){
             if(strcmp(name, interfaces[x].name)==0){
               foundSocket = interfaces[x].socket;
               arpPacketReq(buffer, tableIP, interfaces);
@@ -238,10 +259,10 @@ int main(){
 }
 
 // populate table struct
-void readFiles(struct table tableInfo[7]){
+void readFiles( char* filename,struct table tableInfo[numTable]){
     printf("here2\n");
-    char filename[12];
-    fgets(filename, 13, stdin);
+    // char filename[12];
+    // fgets(filename, 13, stdin);
     printf("\nfilename: %s\n", filename);
     FILE *fptr = fopen(filename, "r");
     if (fptr == NULL)
