@@ -13,7 +13,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <netinet/ip_icmp.h>
-//noice boys
+//noice boys good stuff
 //Allison Bolen, Cade Baker, Andy Hung
 // part two
 struct table {
