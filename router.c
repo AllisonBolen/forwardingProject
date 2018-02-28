@@ -13,7 +13,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <netinet/ip_icmp.h>
-//noice boys 
+//noice boys
 //Allison Bolen, Cade Baker, Andy Hung
 // part two
 struct table {
@@ -408,4 +408,17 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
   memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
+}
+
+void cksum(u_short *buf, int count){
+  register u_long sum = 0;
+  while(count--){
+    sum += *buf++;
+    if(sum & 0xFFFF0000){
+      //carry occured. so wrap around
+      sum &= 0xFFFF;
+      sum++;
+    }
+  }
+  return ~(sum & 0xFFFF);
 }
