@@ -202,6 +202,8 @@ int main(){
           in_addr_t tableIP;
           char name[20];
           int k;
+          in_addr_t fromPacket;
+          memcpy(&fromPacket, &ipReq.daddr, 4);
           for(k = 0 ; k < numTable; k++){
             // sepreate on slash
             //10.0.0.0/16 total lenght 11
@@ -221,8 +223,7 @@ int main(){
             int compare = atoi(byteCmp);
             int bytenum = compare/8;
             // get addres form packet
-            in_addr_t fromPacket;
-            memcpy(&fromPacket, &ipReq.daddr, 4);
+
 	          char * t = inet_ntoa(*(struct in_addr *)&IPNum);
             printf("FromPacket: %s\n", t);
 
