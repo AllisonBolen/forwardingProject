@@ -205,26 +205,36 @@ int main(){
             //10.0.0.0/16 total lenght 11
             char byteCmp[3];
             printf("\nIm Here right now\n");
-            memcpy(&byteCmp, &tableInfo[k].prefix[10], 2); //print these at some point
+            memcpy(&byteCmp, &tableInfo[k].prefix[9], 2); //print these at some point
             printf("this is the prefix string: %s\n", byteCmp );
             char tablePrefIP[9];
             memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
+	    tablePrefIP[8] = '\0';
             printf("this is the stuff for the ip preix: %s\n",tablePrefIP );
             in_addr_t IPNum = inet_addr(tablePrefIP);//
+
+	    char * y = inet_ntoa(*(struct in_addr *)&IPNum);
+              printf("IPNum from FORUS=0: %s\n", y);
+
             int compare = atoi(byteCmp);
             int bytenum = compare/8;
             // get addres form packet
             in_addr_t fromPacket;
             memcpy(&fromPacket, &ipReq.daddr, 4);
+	    char * t = inet_ntoa(*(struct in_addr *)&IPNum);
+              printf("FromPacket: %s\n", t);
+
+
             int matches = memcmp(&fromPacket, &IPNum, bytenum);
+	    printf("Matches Value: %d\n", matches);
             if(matches==0){
-              if(strcmp(tableInfo[count].ip, "-") != 0){
+              if(strcmp(tableInfo[k].ip, "-") != 0){
                 tableIP = inet_addr(tableInfo[k].ip);
-                strcpy(name, tableInfo[count].name);
+                strcpy(name, tableInfo[k].name);
               }
               else{
                 tableIP = fromPacket;
-                strcpy(name, tableInfo[count].name);
+                strcpy(name, tableInfo[k].name);
               }
             }
           }
@@ -291,16 +301,27 @@ void readFiles( char* filename,struct table tableInfo[numTable]){
 
 void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     printf("Setting up an ARP Request\n");
+    char * z = inet_ntoa(*(struct in_addr *)&tableIP);
+              printf("Table IP Address in ARPPACKETREQ: %s\n", z);
     //build the response for arp
+    int u;
+    uint8_t broadcast[6];
+    char f = 0xFF;
+    for(u = 0; u < 6; u++){
+      broadcast[u]=f;
+    }
+
     struct ether_header ethHdrResp;
     struct ether_arp arpReq;
     int j;
     for(j = 0; j< 7; j++){
       if(memcmp(&interfaces[j].IP, &tableIP, 4) == 0){
           memcpy(&arpReq.arp_sha, &interfaces[j].MAC, 6); // get my mac and make the new source
+	        memcpy(&arpReq.arp_spa, &interfaces[j].IP, 4);
       }
     }
     memcpy(&arpReq.arp_tpa, &tableIP, 4);  // switch ips // should be what we want
+    memcpy(&arpReq.arp_tha, &broadcast , 4)
     //memcpy(&arpReq.arp_spa, tableIP, 4); //switch ips // source should be the router address
     arpReq.ea_hdr.ar_op = htons(1); // change op code for r
     arpReq.ea_hdr.ar_pro = htons(ETHERTYPE_IP);
@@ -308,12 +329,6 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     arpReq.ea_hdr.ar_pln = 4;
     arpReq.ea_hdr.ar_hrd = htons(1);
     // change ehternet header
-    int u;
-    uint8_t broadcast[6];
-    char f = 0xFF;
-    for(u = 0; u < 6; u++){
-      broadcast[u]=f;
-    }
 
     memcpy(&ethHdrResp.ether_shost, &arpReq.arp_sha, 6);// get mac of me to them
     memcpy(&ethHdrResp.ether_dhost, &broadcast, 6);// set this to the broadcast
@@ -387,4 +402,3 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
   memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
-}
