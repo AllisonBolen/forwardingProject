@@ -310,7 +310,6 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
     for(u = 0; u < 6; u++){
       broadcast[u]=f;
     }
-
     struct ether_header ethHdrResp;
     struct ether_arp arpReq;
     int j;
@@ -321,7 +320,7 @@ void arpPacketReq(char *buf, in_addr_t tableIP, struct interface interfaces[]){
       }
     }
     memcpy(&arpReq.arp_tpa, &tableIP, 4);  // switch ips // should be what we want
-    memcpy(&arpReq.arp_tha, &broadcast , 4)
+    memcpy(&arpReq.arp_tha, &broadcast , 4);
     //memcpy(&arpReq.arp_spa, tableIP, 4); //switch ips // source should be the router address
     arpReq.ea_hdr.ar_op = htons(1); // change op code for r
     arpReq.ea_hdr.ar_pro = htons(ETHERTYPE_IP);
@@ -402,3 +401,4 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
   memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
+}
