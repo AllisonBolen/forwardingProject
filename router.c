@@ -160,9 +160,9 @@ int main(){
                   // switch the source to r1 and add the mac of the arp resp to teh message packt
                   printf("SENT THE STORED PACKET TO THE DESTINATION\n");
                   // decrement ttl before sending
-                  _u8 dec = 1;
+                  __u8 dec = 1;
                   ipReq.ttl = ipReq.ttl - dec; // probably fine ????
-                  memcpy(storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
+                  memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
                   memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
