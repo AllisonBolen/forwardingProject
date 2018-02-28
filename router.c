@@ -218,18 +218,13 @@ int main(){
 	          tablePrefIP[8] = '\0';
             //printf("this is the stuff for the ip preix: %s\n",tablePrefIP );
             in_addr_t IPNum = inet_addr(tablePrefIP);//
-
 	          char * y = inet_ntoa(*(struct in_addr *)&IPNum);
             //printf("IPNum from FORUS=0: %s\n", y);
-
             int compare = atoi(byteCmp);
             int bytenum = compare/8;
             // get addres form packet
-
 	          char * t = inet_ntoa(*(struct in_addr *)&IPNum);
             //printf("FromPacket: %s\n", t);
-
-
             int matches = memcmp(&fromPacket, &IPNum, bytenum);
 	          //printf("Matches Value: %d\n", matches);
             if(matches==0){
@@ -246,7 +241,6 @@ int main(){
               }
             }
           }
-
           // store the message
           int m;
           for(m = 0 ; m < 100; m++){
@@ -255,6 +249,7 @@ int main(){
 	            memcpy(storedMessage[m].buff, buf, 1500);
               storedMessage[m].valid = 1;
               storedMessage[m].waitingfor = tableIP;// address arp is being sent to
+              break;
             }
           }
           char buffer[1500];
