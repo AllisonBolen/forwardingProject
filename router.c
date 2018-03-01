@@ -182,7 +182,7 @@ int main(){
           //struct ether_header ethHdr;
           struct ether_header ethResp;
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr)); // get the ip header
-          if(ntohs(ipReq.ttl) > 1 ){ // check the ttl for next hop if it equals one do sending for it
+          //if(ntohs(ipReq.ttl) > 1 ){ // check the ttl for next hop if it equals one do sending for it
             // check if its for me or not if its not for me we forward if
             int n;
             int forus = 0;
@@ -273,7 +273,7 @@ int main(){
               }
             }
           }
-        }
+        //}
         //else{ // the ttl has is 1 so we should drop the packet / just ignore it
         //}
       }
