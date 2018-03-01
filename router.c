@@ -13,32 +13,37 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <netinet/ip_icmp.h>
-//noice boys good stuff
 //Allison Bolen, Cade Baker, Andy Hung
-// part two
+
+/// table structure for storing file data ///
 struct table {
       char* ip;
       char* prefix;
       char* name;
 };
-
+/// interface structure for storing interface data ///
 struct interface {
       char* name;
       uint8_t MAC[6];
       uint8_t IP[4];
       int socket;
 };
-
+/// message structure for storing messages that need to be sent ///
 struct message{
   char buff[1500];
   int valid;
   in_addr_t waitingfor;
 };
 
+/// do the checksum stuff sends in the ipheader or icmp header that needs checking or filling/generating and calculates the checksum
 u_short cksum(u_short *buf, int count);
+///  send teh arp packet request when we are forwarding, takes in a name and a packet and the intefaces list  ///
 void arpPacketReq(char *buf, in_addr_t tableIP, char* name, struct interface interfaces[]);
+///  sends the arp response when the router gets an arp request  ///
 void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *buf);
+///  reads the files and populates the table structures in the list correctly depending on where its reading from  ///
 void readFiles(char* filename, struct table tableInfo[4]);
+///  sends teh ICMP reply if the router is being pinged  ///
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 int numInterfaces = 0;
 int numTable = 0;
