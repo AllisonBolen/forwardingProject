@@ -161,7 +161,9 @@ int main(){
                   printf("SENT THE STORED PACKET TO THE DESTINATION\n");
                   // decrement ttl before sending
                   __u8 dec = 1;
-                  //ipReq.ttl = ipReq.ttl - dec; // probably fine ????
+
+                  dec = ipReq.ttl - dec;
+                  memcpy(&ipReq.ttl, &dec, sizeof(__u8)); // probably fine ????
                   memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
