@@ -189,7 +189,7 @@ int main(){
             // if(memcmp(&sumcheck, &ipReq) == 0){
               /// if the cecksum and sumcheck match continue as normal ///
               int n;
-              int forus = 0;
+              int forus = 0; /// boolean for telling us if teh packet was meant for the current router or not. ///
               for(n =0;n < numInterfaces; n++){ /// check if its for me or not if its not for me we forward if ///
                 if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ /// if the ip the prequest is destined for is the current router respond to it ///
                   forus=1;
@@ -407,16 +407,16 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
 }
 
-/// check sum for the packets ///
-u_short cksum(u_short *buf, int count){
-  register u_long sum = 0;
-  while(count--){
-    sum += *buf++;
-    if(sum & 0xFFFF0000){
-      //carry occured. so wrap around
-      sum &= 0xFFFF;
-      sum++;
-    }
-  }
-  return ~(sum & 0xFFFF);
-}
+/// check sum for the packets gotten from page 95 of the class textbook  ///
+// u_short cksum(u_short *buf, int count){
+//   register u_long sum = 0;
+//   while(count--){
+//     sum += *buf++;
+//     if(sum & 0xFFFF0000){
+//       //carry occured. so wrap around
+//       sum &= 0xFFFF;
+//       sum++;
+//     }
+//   }
+//   return ~(sum & 0xFFFF);
+// }
