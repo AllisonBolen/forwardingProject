@@ -187,9 +187,9 @@ int main(){
             /// check the checksum on the ip header ///
              char hold[20];
              memcpy(&hold, &ipReq, sizeof(ipReq));
-             int 16wordnum = sizeof(ipReq)/2; /// how many 2 bytes ar there in this thing because one 16bitword for every 2 bytes ///
-             __u16 sumcheck = cksum(hold, 1616wordnum);
-             if(memcmp(&sumcheck, &ipReq) == 0){
+             int wordnum = sizeof(ipReq)/2; /// how many 2 bytes ar there in this thing because one 16bitword for every 2 bytes ///
+             __u16 sumcheck = cksum(hold, wordnum);
+             if(memcmp(&sumcheck, &ipReq.check, sizeof) == 0){
               /// if the cecksum and sumcheck match continue as normal ///
               int n;
               int forus = 0; /// boolean for telling us if teh packet was meant for the current router or not. ///
