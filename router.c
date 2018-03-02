@@ -45,6 +45,8 @@ void arpPacketResp(struct interface interfaces[], struct ether_header eh, char *
 void readFiles(char* filename, struct table tableInfo[4]);
 ///  sends the ICMP reply if the router is being pinged  ///
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
+///  sends the ICMP ERROR packet if the router is being pinged  ///
+void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error);
 ///  the number of interfaces we are connected to at the moment   ///
 int numInterfaces = 0;
 ///  the numebr of prefix inforamtion we need to hold  ///
@@ -410,7 +412,25 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
 }
 
-void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf){
+void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error){
+  int typenew;
+  if( errorCheck = 1){
+    /// we got a ttl of one so we drop the packet and need to send a new one with the right opcode ///
+    typenew = 11; // time exceeded
+  }
+  if( errorCheck = 2){
+    /// we got a timeout ont eh arp for the next hop need to send another icmp error packet mising host///
+    typenew = 1; // time exceeded
+  }
+  if( errorCheck == 3){
+    /// cant find network int eh table drop the packet send an error for host unreachable ///
+    typenew  = 0 ;
+  }
+  // if( errorCheck = 4){
+  //   /// we checksums didnt match send an error packet ///
+  //   //typenew = 11; // time exceeded
+  // }
+
   struct icmphdr icmpReq;
   struct icmphdr icmpResp;
   memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));/// get the icmp header ///
