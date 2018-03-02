@@ -184,9 +184,12 @@ int main(){
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr));
           if(ntohs(ipReq.ttl) > 1 ){ /// check the ttl for next hop if it equals one do sending for it ///
 
-            // check the checksum on the ip header
-            // __u8 sumcheck = cksum(ipReq, sizeof(ipReq));
-            // if(memcmp(&sumcheck, &ipReq) == 0){
+            /// check the checksum on the ip header ///
+             char hold[20];
+             memcpy(&hold, &ipReq, sizeof(ipReq));
+             int 16wordnum = sizeof(ipReq)/2; /// how many 2 bytes ar there in this thing because one 16bitword for every 2 bytes ///
+             __u16 sumcheck = cksum(hold, 1616wordnum);
+             if(memcmp(&sumcheck, &ipReq) == 0){
               /// if the cecksum and sumcheck match continue as normal ///
               int n;
               int forus = 0; /// boolean for telling us if teh packet was meant for the current router or not. ///
@@ -269,7 +272,7 @@ int main(){
                 }
               }
             }
-          //}// make it out of this and teh IPHDR check sum didnt match properly
+          }// make it out of this and teh IPHDR check sum didnt match properly
         }// make it out of the ip digits less then one on the ttl then you should send an error packet back
       }
     }
@@ -407,16 +410,49 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
 }
 
+void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf){
+  struct icmphdr icmpReq;
+  struct icmphdr icmpResp;
+  memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));/// get the icmp header ///
+  ///  swap ethernet header info ///
+  memcpy(&ethResp.ether_shost,&eh.ether_dhost,6);
+  memcpy(&ethResp.ether_dhost, &eh.ether_shost,6);
+  ethResp.ether_type = eh.ether_type;
+  /// swap the ip header info ///
+  memcpy(&ipResp.saddr, &ipReq.daddr, 4);
+  memcpy(&ipResp.daddr, &ipReq.saddr, 4);
+  ipResp.ihl=ipReq.ihl;
+  ipResp.version = ipReq.version;
+  ipResp.tos = ipReq.tos; /// copy inof over ///
+  ipResp.tot_len = ipReq.tot_len;
+  ipResp.id = ipReq.id;
+  ipResp.frag_off = ipReq.frag_off;
+  ipResp.ttl = ipReq.ttl;
+  ipResp.protocol = ipReq.protocol;
+  ipResp.check = ipReq.check;
+  /// swap icmp stuff now ///
+  icmpResp.code = icmpReq.code;/// set it to echo reply ///
+  icmpResp.type = 0;
+  icmpResp.checksum = icmpReq.checksum;
+  icmpResp.un.echo.id = icmpReq.un.echo.id;
+  icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
+
+  /// fill the buffer again ///
+  memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
+  memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
+  memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
+}
+
 /// check sum for the packets gotten from page 95 of the class textbook  ///
-// u_short cksum(u_short *buf, int count){
-//   register u_long sum = 0;
-//   while(count--){
-//     sum += *buf++;
-//     if(sum & 0xFFFF0000){
-//       //carry occured. so wrap around
-//       sum &= 0xFFFF;
-//       sum++;
-//     }
-//   }
-//   return ~(sum & 0xFFFF);
-// }
+u_short cksum(u_short *buf, int count){
+  register u_long sum = 0;
+  while(count--){
+    sum += *buf++;
+    if(sum & 0xFFFF0000){
+      //carry occured. so wrap around
+      sum &= 0xFFFF;
+      sum++;
+    }
+  }
+  return ~(sum & 0xFFFF);
+}
