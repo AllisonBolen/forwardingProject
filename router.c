@@ -185,9 +185,9 @@ int main(){
           if(ntohs(ipReq.ttl) > 1 ){ /// check the ttl for next hop if it equals one do sending for it ///
 
             /// check the checksum on the ip header ///
-             char hold[20];
+             u_short hold[10];
              memcpy(&hold, &ipReq, sizeof(ipReq));
-             int wordnum = sizeof(ipReq)/2; /// how many 2 bytes ar there in this thing because one 16bitword for every 2 bytes ///
+             int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
              __u16 sumcheck = cksum(hold, wordnum);
              if(memcmp(&sumcheck, &ipReq.check, sizeof) == 0){
               /// if the cecksum and sumcheck match continue as normal ///
