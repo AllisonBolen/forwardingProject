@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <netinet/ip_icmp.h>
 #include <time.h>
+#include <math.h>
 ///  Allison Bolen, Cade Baker, Andy Hung  ///
 
 /// table structure for storing file data ///
