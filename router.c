@@ -15,6 +15,7 @@
 #include <netinet/ip_icmp.h>
 #include <time.h>
 #include <math.h>
+#include <inttypes.h>
 ///  Allison Bolen, Cade Baker, Andy Hung  ///
 
 /// table structure for storing file data ///
@@ -172,9 +173,16 @@ int main(){
                   /// decrement ttl before sending ///
                   __u8 dec = 1;
                   dec = ipReq.ttl - dec;
-                  // memcpy(&ipReq.ttl, &dec, sizeof(__u8)); // probably fine ????
-                  // memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
+                  memcpy(&ipReq.ttl, &dec, sizeof(__u8)); // probably fine ????
+                  memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
+                  // change the checksum
+                  u_short hold[10];
+                  memcpy(&hold, &ipReq, sizeof(ipReq));
+                  int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
+                  __u16 sumcheck = cksum(hold, wordnum);
+                  memcpy(&ipReq.checksum, sumcheck, 16)
+                  memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
                   memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
                   memcpy(&storedMessage[y].buff[0], &sendEh,14); //reset the biffer to be sents header.
@@ -258,6 +266,11 @@ int main(){
                   }
                 }
               }
+              else{
+                /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
+                icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
+                send(i, buf, 98, 0);
+              }
               /// we have to store the message, cant jsut send it becasue the router doesnt know the mac of the next hop of the packet so we need to store it and then send and arp ///
               int m;
               for(m = 0 ; m < 100; m++){ ///  check the whole array of message structures for an empty or overwritable structure   ///
@@ -283,10 +296,14 @@ int main(){
             }
           }
           else{ /// the IPHDR check sum didnt match properly drop the packet  ///
-            icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 0);
+            icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 4);
             send(i, buf, 98, 0);
           }
-        }// make it out of the ip digits less then one on the ttl then you should send an error packet back
+        }
+        else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
+          icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 1);
+          send(i, buf, 98, 0);
+        }
       }
     }
   }
@@ -332,7 +349,7 @@ void readFiles( char* filename,struct table tableInfo[numTable]){
     fclose(fptr);
   }
 
-///  send teh arp for the next hop  ///
+///  send the arp for the next hop  ///
 void arpPacketReq(char *buf, in_addr_t tableIP, char* name, struct interface interfaces[]){
     printf("Setting up an ARP Request\n");
     char * z = inet_ntoa(*(struct in_addr *)&tableIP);
@@ -452,17 +469,17 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
     typenew = 11; // time exceeded
   }
   if( error = 2){
-    /// we got a timeout ont eh arp for the next hop need to send another icmp error packet mising host///
-    typenew = 1; // time exceeded
+    /// we got a timeout on the arp for the next hop need to send another icmp error packet missing host///
+    typenew = 1; // missing host
   }
   if( error == 3){
-    /// cant find network int eh table drop the packet send an error for host unreachable ///
-    typenew  = 0 ;
+    /// cant find network int eh table drop the packet send an error for network unreachable ///
+    typenew  = 3 ;
   }
-  // if( errorCheck = 4){
-  //   /// we checksums didnt match send an error packet ///
-  //   //typenew = 11; // time exceeded
-  // }
+  if( error = 4){
+    /// we checksums didnt match send an error packet ///
+    typenew = 11; // time exceeded ????
+  }
 
   struct icmphdr icmpReq;
   struct icmphdr icmpResp;
