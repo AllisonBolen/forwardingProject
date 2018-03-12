@@ -231,7 +231,7 @@ int main(){
                 }
               }
 
-              here = false;
+              int here = 1;
             if(forus==0){ /// the packet is not destined for the router so we need to find weher it needs to go by comparing it to table info  ///
               printf("Packet for somethign other than the router");
               ///  table look up  ///
@@ -267,7 +267,7 @@ int main(){
                   }
                 }
               }
-              if(!here){
+              if(here == 1){
                   /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
                   icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
                   send(i, buf, 98, 0);
