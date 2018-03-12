@@ -255,7 +255,7 @@ int main(){
                 ///  compare the prefix bytes of the ips  ///
                 int matches = memcmp(&fromPacket, &IPNum, bytenum);
                 if(matches==0){ ///  if they match then the target of the packet is something we can reach somehow  ///
-                  here = true;
+                  here = 0;
                   if(strcmp(tableInfo[k].ip, "-") != 0){  /// if the ip is NOT a dash then it is somthing we have to go trough router two to get to. ///
                     /// sets the tableip to that ip for s new dest in ou rarp packet ///
                     tableIP = inet_addr(tableInfo[k].ip);
