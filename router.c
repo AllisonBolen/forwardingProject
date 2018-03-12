@@ -181,7 +181,7 @@ int main(){
                   memcpy(&hold, &ipReq, sizeof(ipReq));
                   int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
                   __u16 sumcheck = cksum(hold, wordnum);
-                  memcpy(&ipReq.checksum, sumcheck, 16)
+                  memcpy(&ipReq.check, &sumcheck, 16);
                   memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
                   memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
@@ -231,7 +231,7 @@ int main(){
                 }
               }
 
-
+              here = false;
             if(forus==0){ /// the packet is not destined for the router so we need to find weher it needs to go by comparing it to table info  ///
               printf("Packet for somethign other than the router");
               ///  table look up  ///
@@ -255,6 +255,7 @@ int main(){
                 ///  compare the prefix bytes of the ips  ///
                 int matches = memcmp(&fromPacket, &IPNum, bytenum);
                 if(matches==0){ ///  if they match then the target of the packet is something we can reach somehow  ///
+                  here = true;
                   if(strcmp(tableInfo[k].ip, "-") != 0){  /// if the ip is NOT a dash then it is somthing we have to go trough router two to get to. ///
                     /// sets the tableip to that ip for s new dest in ou rarp packet ///
                     tableIP = inet_addr(tableInfo[k].ip);
@@ -266,11 +267,12 @@ int main(){
                   }
                 }
               }
-              else{
-                /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
-                icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
-                send(i, buf, 98, 0);
+              if(!here){
+                  /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
+                  icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
+                  send(i, buf, 98, 0);
               }
+
               /// we have to store the message, cant jsut send it becasue the router doesnt know the mac of the next hop of the packet so we need to store it and then send and arp ///
               int m;
               for(m = 0 ; m < 100; m++){ ///  check the whole array of message structures for an empty or overwritable structure   ///
