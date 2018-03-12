@@ -34,10 +34,10 @@ struct message{
   char buff[1500];
   int valid;
   in_addr_t waitingfor;
-  long timeCaught;
+  long timeMS;
   /// evertime you store a packet sßtore a time stamp, every so often check the tiem statmp and if their old invalidate tehm and send an error mesage about it.
   /// how long before we go and check, sleact has a time out se t it to 100ms if selesct has a time out check you list because you got
-   ß
+
 };
 
 /// do the checksum stuff sends in the ipheader or icmp header that needs checking or filling/generating and calculates the checksum
@@ -52,6 +52,8 @@ void readFiles(char* filename, struct table tableInfo[4]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 ///  sends the ICMP ERROR packet if the router is being pinged  ///
 void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error);
+///  used for timeout checking stored in the message sturcture  ///
+void genTime(long timeMS);
 ///  the number of interfaces we are connected to at the moment   ///
 int numInterfaces = 0;
 ///  the numebr of prefix inforamtion we need to hold  ///
@@ -301,7 +303,7 @@ void genTime(long timeMS){
   clock_gettime(CLOCK_REALTIME, &spec);
   seconds = spec.tv_sec;
   timeMS = round(spec.tv_nsec/1.0e6);
-  if(ms > 999){
+  if(timeMS > 999){
     seconds++;
     timeMS = 0;
   }
@@ -444,15 +446,15 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
 
 void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error){
   int typenew;
-  if( errorCheck = 1){
+  if( error = 1){
     /// we got a ttl of one so we drop the packet and need to send a new one with the right opcode ///
     typenew = 11; // time exceeded
   }
-  if( errorCheck = 2){
+  if( error = 2){
     /// we got a timeout ont eh arp for the next hop need to send another icmp error packet mising host///
     typenew = 1; // time exceeded
   }
-  if( errorCheck == 3){
+  if( error == 3){
     /// cant find network int eh table drop the packet send an error for host unreachable ///
     typenew  = 0 ;
   }
