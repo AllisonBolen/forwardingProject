@@ -13,7 +13,8 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <netinet/ip_icmp.h>
-//Allison Bolen, Cade Baker, Andy Hung
+#include <time.h>
+///  Allison Bolen, Cade Baker, Andy Hung  ///
 
 /// table structure for storing file data ///
 struct table {
@@ -33,6 +34,10 @@ struct message{
   char buff[1500];
   int valid;
   in_addr_t waitingfor;
+  long timeCaught;
+  /// evertime you store a packet sßtore a time stamp, every so often check the tiem statmp and if their old invalidate tehm and send an error mesage about it.
+  /// how long before we go and check, sleact has a time out se t it to 100ms if selesct has a time out check you list because you got
+   ß
 };
 
 /// do the checksum stuff sends in the ipheader or icmp header that needs checking or filling/generating and calculates the checksum
@@ -211,10 +216,10 @@ int main(){
                         send(i,buf, 98, 0);
               		      printf("%s\n", "Sending ICMP Response packet");
                     }
-                  //}
+                  }
                 }
               }
-            }
+
 
             if(forus==0){ /// the packet is not destined for the router so we need to find weher it needs to go by comparing it to table info  ///
               printf("Packet for somethign other than the router");
@@ -256,7 +261,8 @@ int main(){
                 if(storedMessage[m].valid == 0){ ///  if its zero then the structure at this spot is valid to be overwritten  ///
     	            memcpy(storedMessage[m].buff, buf, 1500);
                   storedMessage[m].valid = 1;
-                  storedMessage[m].waitingfor = tableIP;  /// address arp is being sent to that the message needs to wait for a response from  ///
+                  storedMessage[m].waitingfor = tableIP;
+                  genTime(&storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
                   break;
                 }
               }
@@ -266,15 +272,17 @@ int main(){
               for(x =0; x < numInterfaces; x++){ ///  loop through sockets to find the one to send the arp request on  ///
                 if(strcmp(name, interfaces[x].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
                   foundSocket = interfaces[x].socket;
-                  // char * z = inet_ntoa(*(struct in_addr *)&tableIP);
-                  // printf("%s\n", z);
                   arpPacketReq(buffer, tableIP, name, interfaces);
                   send(foundSocket, buffer, 42, 0);
                   printf("Sent the ARP request for the packet destined for something other than the current router\n" );
                 }
               }
             }
-          }// make it out of this and teh IPHDR check sum didnt match properly
+          }
+          else{ /// the IPHDR check sum didnt match properly drop the packet  ///
+            icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 0);
+            send(i, buf, 98, 0);
+          }
         }// make it out of the ip digits less then one on the ttl then you should send an error packet back
       }
     }
@@ -282,6 +290,21 @@ int main(){
  }
   freeifaddrs(ifaddr);
   return 0;
+}
+
+/// get time so you can track the timeout stuff, gotten from https://stackoverflow.com/questions/3756323/how-to-get-the-current-time-in-milliseconds-from-c-in-linux ///
+void genTime(long timeMS){
+  //long timeMS;
+  time_t seconds;
+  struct timespec spec;
+
+  clock_gettime(CLOCK_REALTIME, &spec);
+  seconds = spec.tv_sec;
+  timeMS = round(spec.tv_nsec/1.0e6);
+  if(ms > 999){
+    seconds++;
+    timeMS = 0;
+  }
 }
 
 /// populate table array of table structs ///
@@ -328,6 +351,7 @@ void arpPacketReq(char *buf, in_addr_t tableIP, char* name, struct interface int
 	        memcpy(&arpReq.arp_spa, &interfaces[j].IP, 4);
       }
     }
+
     memcpy(&arpReq.arp_tpa, &tableIP, 4);  /// switch ips ///
     memcpy(&arpReq.arp_tha, &broadcast , 6);
     arpReq.ea_hdr.ar_op = htons(1); /// change op code for r///
@@ -402,7 +426,13 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
   /// swap icmp stuff now ///
   icmpResp.code = icmpReq.code;/// set it to echo reply ///
   icmpResp.type = 0;
-  icmpResp.checksum = icmpReq.checksum;
+
+  u_short hold[10];
+  memcpy(&hold, &ipReq, sizeof(ipReq));
+  int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
+  __u16 sumcheck = cksum(hold, wordnum);
+
+  icmpResp.checksum = sumcheck;
   icmpResp.un.echo.id = icmpReq.un.echo.id;
   icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
 
@@ -452,8 +482,14 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
   ipResp.check = ipReq.check;
   /// swap icmp stuff now ///
   icmpResp.code = icmpReq.code;/// set it to echo reply ///
-  icmpResp.type = 0;
-  icmpResp.checksum = icmpReq.checksum;
+  icmpResp.type = typenew;
+
+  u_short hold[10];
+  memcpy(&hold, &ipReq, sizeof(ipReq));
+  int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
+  __u16 sumcheck = cksum(hold, wordnum);
+
+  icmpResp.checksum = sumcheck;
   icmpResp.un.echo.id = icmpReq.un.echo.id;
   icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
 
