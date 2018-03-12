@@ -264,7 +264,7 @@ int main(){
     	            memcpy(storedMessage[m].buff, buf, 1500);
                   storedMessage[m].valid = 1;
                   storedMessage[m].waitingfor = tableIP;
-                  genTime(&storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
+                  genTime(storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
                   break;
                 }
               }
