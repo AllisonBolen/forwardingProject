@@ -55,7 +55,7 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
 ///  sends the ICMP ERROR packet if the router is being pinged  ///
 void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error);
 ///  used for timeout checking stored in the message sturcture  ///
-void genTime(long timeMS);
+void genTime(long* timeMS);
 ///  the number of interfaces we are connected to at the moment   ///
 int numInterfaces = 0;
 ///  the numebr of prefix inforamtion we need to hold  ///
