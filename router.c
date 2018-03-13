@@ -516,6 +516,7 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
   memcpy(&ethResp.ether_shost,&eh.ether_dhost,6);
   memcpy(&ethResp.ether_dhost, &eh.ether_shost,6);
   ethResp.ether_type = eh.ether_type;
+
   /// swap the ip header info ///
   memcpy(&ipResp.saddr, &ipReq.daddr, 4);
   memcpy(&ipResp.daddr, &ipReq.saddr, 4);
@@ -527,31 +528,36 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
   ipResp.frag_off = ipReq.frag_off;
   ipResp.ttl = ipReq.ttl;
   ipResp.protocol = ipReq.protocol;
-  ipResp.check = ipReq.check;
+  ipResp.check = 0;
+  /// this is the ip check sum build ip set the ipchsum to zero and send it in then get out the thing
+  u_short hold[10];
+  memcpy(&hold, &ipReq, sizeof(struct iphdr));
+  int wordnum = sizeof(struct iphdr)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
+  __u16 sumcheck = cksum(hold, wordnum);
+  ipResp.check = sumcheck
+
   /// swap icmp stuff now ///
   icmpResp.code = codeCH;/// set it to echo reply ///
   icmpResp.type = typenew;
 
-  /// this is the ip check sum build ip set the ipchsum to zero and send it in then get out the thing
-  u_short hold[10];
-  memcpy(&hold, &ipReq, sizeof(ipReq));
-  int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
-  __u16 sumcheck = cksum(hold, wordnum);
-
-  icmpResp.checksum = sumcheck;
+  icmpResp.checksum = 0;
   icmpResp.un.echo.id = icmpReq.un.echo.id;
   icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
 
   /// Icmp change
-  u_short hold[18]; // size of icmp and old ip and 8 byts
-  memcpy(&hold, &ipReq, sizeof(ipReq));
-  int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
-  __u16 sumcheck = cksum(hold, wordnum);
+  u_short holdIcmp[18]; // size of icmp and old ip and 8 byts
+  memcpy(&holdIcmp, &buf[14], 32);
+  int wordnumIcmp = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
+  __u16 sumcheckIcnmp = cksum(holdIcmp, wordnumIcmp);
+
+  icmpResp.checksum = sumcheckIcmp;
+  icmpResp.un.echo.id = icmpReq.un.echo.id;
+  icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
 
   /// fill the buffer again ///
   memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
   memcpy(&buf[sizeof(struct ether_header)],&ipResp, sizeof(struct iphdr));
-  memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(icmpResp));
+  memcpy(&buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], &icmpResp, sizeof(struct icmphdr));
 }
 
 /// check sum for the packets gotten from page 95 of the class textbook  ///
