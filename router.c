@@ -548,7 +548,7 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
   u_short holdIcmp[18]; // size of icmp and old ip and 8 byts
   memcpy(&holdIcmp, &buf[14], 32);
   int wordnumIcmp = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
-  __u16 sumcheckIcnmp = cksum(holdIcmp, wordnumIcmp);
+  __u16 sumcheckIcmp = cksum(holdIcmp, wordnumIcmp);
 
   icmpResp.checksum = sumcheckIcmp;
   icmpResp.un.echo.id = icmpReq.un.echo.id;
