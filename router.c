@@ -534,7 +534,7 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
   memcpy(&hold, &ipReq, sizeof(struct iphdr));
   int wordnum = sizeof(struct iphdr)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
   __u16 sumcheck = cksum(hold, wordnum);
-  ipResp.check = sumcheck
+  ipResp.check = sumcheck;
 
   /// swap icmp stuff now ///
   icmpResp.code = codeCH;/// set it to echo reply ///
