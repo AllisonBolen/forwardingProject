@@ -152,7 +152,7 @@ int main(){
           if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
             memcpy(&eth, &pck[0], 14);
-            memcpy(&ipReq, &pck[14], sizeof(struct iphdr))
+            memcpy(&ipReq, &pck[14], sizeof(struct iphdr));
             icmpPacketERROR(interfaces, eth, ipReq, eth, ipReq, pck, 2);
             send(storedMessage[k].socketTO, pck, 98, 0);
             storedMessage[k].valid = 0;
