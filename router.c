@@ -39,7 +39,6 @@ struct message{
   long timeMS;
   /// evertime you store a packet sßtore a time stamp, every so often check the tiem statmp and if their old invalidate tehm and send an error mesage about it.
   /// how long before we go and check, sleact has a time out se t it to 100ms if selesct has a time out check you list because you got
-
 };
 
 /// do the checksum stuff sends in the ipheader or icmp header that needs checking or filling/generating and calculates the checksum
@@ -136,7 +135,21 @@ int main(){
       struct sockaddr_ll recvaddr;
       int recvaddrlen=sizeof(struct sockaddr_ll);
       fd_set tmp_set = sockets;
-      select(FD_SETSIZE,&tmp_set, NULL, NULL, NULL);
+      struct timeval tv = {100, 0};
+      int timeout = select(FD_SETSIZE,&tmp_set, NULL, NULL, &tv);
+      if(timeout == 0){
+        // send the thing i need it to send // didnt get to the host we wanted
+        // check the message array for the time in each one and then delecte the ones that have been sitting for a while
+        // for every packet we delete then send an error for each one send it on the path it came on
+        long now = gentime(&now)
+        for(k = 0; k < sizeof(storedMessage()); k++){
+          if((now - storedMessage[k].timeMS) > 200){
+            icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
+            send(i, buf, 98, 0);
+            storedMessage[k].valid = 0;
+          }
+        }
+      }
       int i;
       for(i=0; i<FD_SETSIZE;i++){ ///  given code  ///
         if(FD_ISSET(i,&tmp_set)){ ///  given code  ///
@@ -174,6 +187,7 @@ int main(){
                   __u8 dec = 1;
                   dec = ipReq.ttl - dec;
                   memcpy(&ipReq.ttl, &dec, sizeof(__u8)); // probably fine ????
+                  memcpy(&ipReq.check, 0, 1); // make chekcsum zero
                   memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   // change the checksum
@@ -181,6 +195,7 @@ int main(){
                   memcpy(&hold, &ipReq, sizeof(ipReq));
                   int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
                   __u16 sumcheck = cksum(hold, wordnum);
+
                   memcpy(&ipReq.check, &sumcheck, 16);
                   memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
@@ -280,7 +295,7 @@ int main(){
     	            memcpy(storedMessage[m].buff, buf, 1500);
                   storedMessage[m].valid = 1;
                   storedMessage[m].waitingfor = tableIP;
-                  genTime(storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
+                  genTime(&storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
                   break;
                 }
               }
@@ -297,10 +312,6 @@ int main(){
               }
             }
           }
-          else{ /// the IPHDR check sum didnt match properly drop the packet  ///
-            icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 4);
-            send(i, buf, 98, 0);
-          }
         }
         else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
           icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 1);
@@ -315,7 +326,7 @@ int main(){
 }
 
 /// get time so you can track the timeout stuff, gotten from https://stackoverflow.com/questions/3756323/how-to-get-the-current-time-in-milliseconds-from-c-in-linux ///
-void genTime(long timeMS){
+void genTime(long *timeMS){
   //long timeMS;
   time_t seconds;
   struct timespec spec;
@@ -465,22 +476,23 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
 }
 
 void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error){
-  int typenew;
+  int typenew, codeCH;
   if( error = 1){
     /// we got a ttl of one so we drop the packet and need to send a new one with the right opcode ///
+    codeCH = 0;
     typenew = 11; // time exceeded
   }
   if( error = 2){
     /// we got a timeout on the arp for the next hop need to send another icmp error packet missing host///
-    typenew = 1; // missing host
+    // code change
+    codeCH = 1;
+    typenew = 3; // missing host
   }
   if( error == 3){
     /// cant find network int eh table drop the packet send an error for network unreachable ///
+    // code chnage
+    codeCH = 0;
     typenew  = 3 ;
-  }
-  if( error = 4){
-    /// we checksums didnt match send an error packet ///
-    typenew = 11; // time exceeded ????
   }
 
   struct icmphdr icmpReq;
@@ -503,9 +515,10 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
   ipResp.protocol = ipReq.protocol;
   ipResp.check = ipReq.check;
   /// swap icmp stuff now ///
-  icmpResp.code = icmpReq.code;/// set it to echo reply ///
+  icmpResp.code = codeCH;/// set it to echo reply ///
   icmpResp.type = typenew;
 
+  /// this is the ip check sum build ip set the ipchsum to zero and send it in then get out the thing
   u_short hold[10];
   memcpy(&hold, &ipReq, sizeof(ipReq));
   int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
@@ -514,6 +527,12 @@ void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, stru
   icmpResp.checksum = sumcheck;
   icmpResp.un.echo.id = icmpReq.un.echo.id;
   icmpResp.un.echo.sequence = icmpReq.un.echo.sequence;
+
+  /// Icmp change
+  u_short hold[18]; // size of icmp and old ip and 8 byts
+  memcpy(&hold, &ipReq, sizeof(ipReq));
+  int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
+  __u16 sumcheck = cksum(hold, wordnum);
 
   /// fill the buffer again ///
   memcpy(&buf[0], &ethResp, sizeof(struct ether_header));
