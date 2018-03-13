@@ -55,7 +55,7 @@ void icmpPacket(struct interface interfaces[], struct ether_header eh, struct ip
 ///  sends the ICMP ERROR packet if the router is being pinged  ///
 void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error);
 ///  used for timeout checking stored in the message sturcture  ///
-void genTime(long* timeMS);
+void genTime(long timeMS);
 ///  the number of interfaces we are connected to at the moment   ///
 int numInterfaces = 0;
 ///  the numebr of prefix inforamtion we need to hold  ///
@@ -142,7 +142,7 @@ int main(){
         // send the thing i need it to send // didnt get to the host we wanted
         // check the message array for the time in each one and then delecte the ones that have been sitting for a while
         // for every packet we delete then send an error for each one send it on the path it came on
-        long now = gentime(&now);
+        long now = gentime(now);
         int k;
         struct iphdr ipReq;
         struct iphdr ipResp;
@@ -305,7 +305,7 @@ int main(){
     	            memcpy(storedMessage[m].buff, buf, 1500);
                   storedMessage[m].valid = 1;
                   storedMessage[m].waitingfor = tableIP;
-                  genTime(&storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
+                  genTime(storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
                   int x;
                   for(x =0; x < numInterfaces; x++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
                     if(strcmp(name, interfaces[x].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
@@ -340,7 +340,7 @@ int main(){
 }
 
 /// get time so you can track the timeout stuff, gotten from https://stackoverflow.com/questions/3756323/how-to-get-the-current-time-in-milliseconds-from-c-in-linux ///
-void genTime(long *timeMS){
+void genTime(long timeMS){
   //long timeMS;
   time_t seconds;
   struct timespec spec;
