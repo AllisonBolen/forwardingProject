@@ -150,7 +150,7 @@ int main(){
 
         for(k = 0; k < sizeof(storedMessage); k++){
           if((now - storedMessage[k].timeMS) > 200){
-            char pck = storedMessage[k].buff
+            char* pck = storedMessage[k].buff;
             icmpPacketERROR(interfaces, pck, ipReq, ethResp, ipResp, buf, 2);
             send(storedMessage[k].socketTO, pck, 98, 0);
             storedMessage[k].valid = 0;
