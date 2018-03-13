@@ -146,12 +146,14 @@ int main(){
         int k;
         struct iphdr ipReq;
         struct iphdr ipResp;
-        struct ether_header ethResp;
+        struct ether_header ethResp, eth;
 
         for(k = 0; k < sizeof(storedMessage); k++){
           if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
-            icmpPacketERROR(interfaces, pck, ipReq, ethResp, ipResp, buf, 2);
+            memcpy(&eth, &pck[0], 14);
+            memcpy(&ipReq, &pck[14], sizeof(struct iphdr))
+            icmpPacketERROR(interfaces, eth, ipReq, eth, ipReq, pck, 2);
             send(storedMessage[k].socketTO, pck, 98, 0);
             storedMessage[k].valid = 0;
           }
