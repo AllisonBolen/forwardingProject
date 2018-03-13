@@ -37,6 +37,7 @@ struct message{
   int valid;
   in_addr_t waitingfor;
   long timeMS;
+  int socketTO; /// socket to send on for timeout ///
   /// evertime you store a packet sßtore a time stamp, every so often check the tiem statmp and if their old invalidate tehm and send an error mesage about it.
   /// how long before we go and check, sleact has a time out se t it to 100ms if selesct has a time out check you list because you got
 };
@@ -143,10 +144,15 @@ int main(){
         // for every packet we delete then send an error for each one send it on the path it came on
         long now = gentime(&now);
         int k;
-        for(k = 0; k < sizeof(storedMessage()); k++){
+        struct iphdr ipReq;
+        struct iphdr ipResp;
+        struct ether_header ethResp;
+
+        for(k = 0; k < sizeof(storedMessage); k++){
           if((now - storedMessage[k].timeMS) > 200){
-            icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
-            send(i, buf, 98, 0);
+            char pck = storedMessage[k].buff
+            icmpPacketERROR(interfaces, pck, ipReq, ethResp, ipResp, buf, 2);
+            send(storedMessage[k].socketTO, pck, 98, 0);
             storedMessage[k].valid = 0;
           }
         }
@@ -178,7 +184,7 @@ int main(){
             ///  switch the data in the stored message packet to whats being sent  ///
             int y;
             for(y = 0; y < 100; y++){ ///  loop tthrough all of our messages stored  ///
-              if(storedMessage[y].valid == 1){ ///  if the message is watingint to be sent - the value of one in valid means it needs to be sent  ///
+              if(storedMessage[y].valid == 1){ ///  if the message is waiting to be sent - the value of one in valid means it needs to be sent  ///
                 memcpy(&arpReq, &buf[sizeof(struct ether_header)], sizeof(struct ether_arp));
                 memcpy(&ipReq, &storedMessage[y].buff[sizeof(struct ether_header)], sizeof(struct iphdr));
                 if(memcmp(&arpReq.arp_spa, &storedMessage[y].waitingfor, 4)==0){  ///  is the storedMessage destined for the destination we jsut recived for, if so then send it  ///
@@ -289,7 +295,7 @@ int main(){
                   send(i, buf, 98, 0);
               }
 
-              /// we have to store the message, cant jsut send it becasue the router doesnt know the mac of the next hop of the packet so we need to store it and then send and arp ///
+              /// we have to store the message, cant just send it becasue the router doesnt know the mac of the next hop of the packet so we need to store it and then send and arp ///
               int m;
               for(m = 0 ; m < 100; m++){ ///  check the whole array of message structures for an empty or overwritable structure   ///
                 if(storedMessage[m].valid == 0){ ///  if its zero then the structure at this spot is valid to be overwritten  ///
@@ -297,6 +303,9 @@ int main(){
                   storedMessage[m].valid = 1;
                   storedMessage[m].waitingfor = tableIP;
                   genTime(&storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
+                  for(x =0; x < numInterfaces; x++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
+                    if(strcmp(name, interfaces[x].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
+                      storedMessage[m].socketTO = interfaces[x].socket;
                   break;
                 }
               }
