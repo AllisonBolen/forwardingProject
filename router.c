@@ -306,6 +306,7 @@ int main(){
                   storedMessage[m].valid = 1;
                   storedMessage[m].waitingfor = tableIP;
                   genTime(&storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
+                  int x;
                   for(x =0; x < numInterfaces; x++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
                     if(strcmp(name, interfaces[x].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
                       storedMessage[m].socketTO = interfaces[x].socket;
