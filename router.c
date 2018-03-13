@@ -310,6 +310,7 @@ int main(){
                   for(p =0; p < numInterfaces; p++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
                     if(strcmp(name, interfaces[p].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
                       storedMessage[m].socketTO = interfaces[p].socket;
+                    }
                   break;
                 }
               }
