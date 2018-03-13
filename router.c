@@ -196,7 +196,8 @@ int main(){
                   __u8 dec = 1;
                   dec = ipReq.ttl - dec;
                   memcpy(&ipReq.ttl, &dec, sizeof(__u8)); // probably fine ????
-                  memcpy(&ipReq.check, 0, 1); // make chekcsum zero
+                  int lol = 0;
+                  memcpy(&ipReq.check, &lol, 1); // make chekcsum zero
                   memcpy(&storedMessage[y].buff[14], &ipReq, sizeof(struct iphdr));
                   memcpy(&sendEh,&storedMessage[y].buff[0],14);
                   // change the checksum
