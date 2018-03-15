@@ -294,7 +294,8 @@ int main(){
                  }
                  if(here == 1){
                      /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
-                     icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
+                     print("didnt match the table: network not found")
+                     icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 3);
                      send(i, buf, 98, 0);
                  }
 
@@ -329,6 +330,7 @@ int main(){
              }
            }
             else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
+             print("TTL too low");
              icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 1);
              send(i, buf, 98, 0);
             }
