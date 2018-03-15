@@ -143,6 +143,7 @@ int main(){
         // send the thing i need it to send // didnt get to the host we wanted
         // check the message array for the time in each one and then delecte the ones that have been sitting for a while
         // for every packet we delete then send an error for each one send it on the path it came on
+        printf("this is a thing")
         int now = (int)time(NULL)*1000; ///current time in miliseconds
         int k;
         struct iphdr ipReq;
@@ -239,7 +240,7 @@ int main(){
              for(n =0;n < numInterfaces; n++){ /// check if its for me or not if its not for me we forward if ///
                if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ /// if the ip the prequest is destined for is the current router respond to it ///
                  forus=1;
-                 printf("\nPACKET FOR THE ROUTER");
+                 printf("\nPACKET FOR THE ROUTER\n");
                  if((ipReq.protocol) == 1){ /// if the ip packet we just got is imcp
                    struct icmphdr icmpReq;
                    memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
