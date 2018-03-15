@@ -142,7 +142,7 @@ int main(){
         // send the thing i need it to send // didnt get to the host we wanted
         // check the message array for the time in each one and then delecte the ones that have been sitting for a while
         // for every packet we delete then send an error for each one send it on the path it came on
-        long now = genTime(now);
+        int now = (int)time(NULL)*1000; ///current time in miliseconds
         int k;
         struct iphdr ipReq;
         struct iphdr ipResp;
@@ -155,7 +155,7 @@ int main(){
             memcpy(&ipReq, &pck[14], sizeof(struct iphdr));
             icmpPacketERROR(interfaces, eth, ipReq, eth, ipReq, pck, 2);
             send(storedMessage[k].socketTO, pck, 98, 0);
-            storedMessage[k].valid = 0;
+            storedMessage[k].valid = 0;time_t seconds;
           }
         }
       }
@@ -303,8 +303,8 @@ int main(){
                    if(storedMessage[m].valid == 0){ ///  if its zero then the structure at this spot is valid to be overwritten  ///
                        memcpy(storedMessage[m].buff, buf, 1500);
                      storedMessage[m].valid = 1;
-                     storedMessage[m].waitingfor = tableIP;
-                     genTime(storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
+                     storedMessage[m].waitingfor = tableIP; /// address arp is being sent to that the message needs to wait for a response from  ///
+                     storedMessage[m].timeMS= (int)time(NULL); /// timeout trash limit
                      int p;
                      for(p =0; p < numInterfaces; p++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
                        if(strcmp(name, interfaces[p].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
