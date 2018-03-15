@@ -54,8 +54,6 @@ void readFiles(char* filename, struct table tableInfo[4]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 ///  sends the ICMP ERROR packet if the router is being pinged  ///
 void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error);
-///  used for timeout checking stored in the message sturcture  ///
-void genTime(long timeMS);
 ///  the number of interfaces we are connected to at the moment   ///
 int numInterfaces = 0;
 ///  the numebr of prefix inforamtion we need to hold  ///
@@ -347,21 +345,6 @@ int main(){
   }
   freeifaddrs(ifaddr);
   return 0;
-}
-
-/// get time so you can track the timeout stuff, gotten from https://stackoverflow.com/questions/3756323/how-to-get-the-current-time-in-milliseconds-from-c-in-linux ///
-void genTime(long timeMS){
-  //long timeMS;
-  time_t seconds;
-  struct timespec spec;
-
-  clock_gettime(CLOCK_REALTIME, &spec);
-  seconds = spec.tv_sec;
-  timeMS = round(spec.tv_nsec/1.0e6);
-  if(timeMS > 999){
-    seconds++;
-    timeMS = 0;
-  }
 }
 
 /// populate table array of table structs ///
