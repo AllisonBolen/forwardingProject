@@ -211,131 +211,131 @@ int main(){
                   memcpy(&sendEh.ether_shost, &eh.ether_dhost, 6); //switch ehter source to r1
                   memcpy(&sendEh.ether_dhost, &eh.ether_shost, 6); // technically wrong but whatever should be r=from teh arp packet
                   memcpy(&storedMessage[y].buff[0], &sendEh,14); //reset the biffer to be sents header.
-                  send(i, storedMessage[y].buff, 98, 0); // how and when do I store a message?
+                  send(i, storedMessage[y].buff, 98, 0);
                   storedMessage[y].valid = 0;
+                }
               }
             }
           }
         }
-      }
 
         if(type == ETHERTYPE_IP){ /// got an IP packet ///
-  	      printf("%s\n", "Received IP Packet");
+          printf("%s\n", "Received IP Packet");
           struct iphdr ipReq;
           struct iphdr ipResp;
           struct ether_header ethResp;
           memcpy(&ipReq, &buf[sizeof(struct ether_header)], sizeof(struct iphdr));
           if(ntohs(ipReq.ttl) > 1 ){ /// check the ttl for next hop if it equals one do sending for it ///
-
             /// check the checksum on the ip header ///
-             u_short hold[10];
-             memcpy(&hold, &ipReq, sizeof(ipReq));
-             int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
-             __u16 sumcheck = cksum(hold, wordnum);
-             if(memcmp(&sumcheck, &ipReq.check, sizeof(ipReq.check)) == 0){
-              /// if the cecksum and sumcheck match continue as normal ///
-              int n;
-              int forus = 0; /// boolean for telling us if teh packet was meant for the current router or not. ///
-              for(n =0;n < numInterfaces; n++){ /// check if its for me or not if its not for me we forward if ///
-                if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ /// if the ip the prequest is destined for is the current router respond to it ///
-                  forus=1;
-                  printf("PACKET FOR THE ROUTER");
-                  if((ipReq.protocol) == 1){ /// if the ip packet we just got is imcp
-                    struct icmphdr icmpReq;
-                    memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
-                    // __u8 sumcheck = cksum(icmpReq, sizeof(ipReq));
-                    // if(memcmp(&sumcheck, &icmpReq) == 0){ ///  icmp checksum sumcheck matches  ///
-                      if(icmpReq.type == 8){ /// got an ICMP packet request for the current router send an ICMP reply packet back
-                        // got an ICMP request packet
-                        printf("%s\n", "Received ICMP Request Packet");
-                        icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
-                        send(i,buf, 98, 0);
-              		      printf("%s\n", "Sending ICMP Response packet");
-                    }
-                  }
-                }
-              }
+            u_short hold[10];
+            memcpy(&hold, &ipReq, sizeof(ipReq));
+            int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
+            __u16 sumcheck = cksum(hold, wordnum);
+            if(memcmp(&sumcheck, &ipReq.check, sizeof(ipReq.check)) == 0){
+             /// if the cecksum and sumcheck match continue as normal ///
+             int n;
+             int forus = 0; /// boolean for telling us if teh packet was meant for the current router or not. ///
+             for(n =0;n < numInterfaces; n++){ /// check if its for me or not if its not for me we forward if ///
+               if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ /// if the ip the prequest is destined for is the current router respond to it ///
+                 forus=1;
+                 printf("PACKET FOR THE ROUTER");
+                 if((ipReq.protocol) == 1){ /// if the ip packet we just got is imcp
+                   struct icmphdr icmpReq;
+                   memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
+                   // __u8 sumcheck = cksum(icmpReq, sizeof(ipReq));
+                   // if(memcmp(&sumcheck, &icmpReq) == 0){ ///  icmp checksum sumcheck matches  ///
+                     if(icmpReq.type == 8){ /// got an ICMP packet request for the current router send an ICMP reply packet back
+                       // got an ICMP request packet
+                       printf("%s\n", "Received ICMP Request Packet");
+                       icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
+                       send(i,buf, 98, 0);
+                       printf("%s\n", "Sending ICMP Response packet");
+                     }
+                   }
+                 }
+               }
 
-              int here = 1;
-            if(forus==0){ /// the packet is not destined for the router so we need to find weher it needs to go by comparing it to table info  ///
-              printf("Packet for somethign other than the router");
-              ///  table look up  ///
-              in_addr_t tableIP;
-              char name[20];
-              in_addr_t fromPacket;
-              memcpy(&fromPacket, &ipReq.daddr, 4);
-              int k;
-              for(k = 0 ; k < numTable; k++){ /// for each table structure in our table list compare its prefix to the first bytenum bytes ///
-                /// sepreate on slash to extract and convert the data in the prefix char 10.0.0.0/16 total lenght 11 ///
-                char byteCmp[3];
-                memcpy(&byteCmp, &tableInfo[k].prefix[9], 2);
-                char tablePrefIP[9];
-                memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
-    	          tablePrefIP[8] = '\0';
-                in_addr_t IPNum = inet_addr(tablePrefIP);//
-    	          char * y = inet_ntoa(*(struct in_addr *)&IPNum);
-                int compare = atoi(byteCmp);
-                int bytenum = compare/8;
-    	          char * t = inet_ntoa(*(struct in_addr *)&IPNum);
-                ///  compare the prefix bytes of the ips  ///
-                int matches = memcmp(&fromPacket, &IPNum, bytenum);
-                if(matches==0){ ///  if they match then the target of the packet is something we can reach somehow  ///
-                  here = 0;
-                  if(strcmp(tableInfo[k].ip, "-") != 0){  /// if the ip is NOT a dash then it is somthing we have to go trough router two to get to. ///
-                    /// sets the tableip to that ip for s new dest in ou rarp packet ///
-                    tableIP = inet_addr(tableInfo[k].ip);
-                    strcpy(name, tableInfo[k].name);
-                  }
-                  else{ ///  the ip didnt match the other routers IP so that means it on the current routers side of the system so the next dst is the actual dstination of the packet///
-                    tableIP = fromPacket;
-                    strcpy(name, tableInfo[k].name);
-                  }
-                }
-              }
-              if(here == 1){
-                  /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
-                  icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
-                  send(i, buf, 98, 0);
-              }
+               int here = 1;
+               if(forus==0){ /// the packet is not destined for the router so we need to find weher it needs to go by comparing it to table info  ///
+                 printf("Packet for somethign other than the router");
+                 ///  table look up  ///
+                 in_addr_t tableIP;
+                 char name[20];
+                 in_addr_t fromPacket;
+                 memcpy(&fromPacket, &ipReq.daddr, 4);
+                 int k;
+                 for(k = 0 ; k < numTable; k++){ /// for each table structure in our table list compare its prefix to the first bytenum bytes ///
+                   /// sepreate on slash to extract and convert the data in the prefix char 10.0.0.0/16 total lenght 11 ///
+                   char byteCmp[3];
+                   memcpy(&byteCmp, &tableInfo[k].prefix[9], 2);
+                   char tablePrefIP[9];
+                   memcpy(&tablePrefIP, &tableInfo[k].prefix[0],8);
+                   tablePrefIP[8] = '\0';
+                   in_addr_t IPNum = inet_addr(tablePrefIP);//
+                   char * y = inet_ntoa(*(struct in_addr *)&IPNum);
+                   int compare = atoi(byteCmp);
+                   int bytenum = compare/8;
+                   char * t = inet_ntoa(*(struct in_addr *)&IPNum);
+                   ///  compare the prefix bytes of the ips  ///
+                   int matches = memcmp(&fromPacket, &IPNum, bytenum);
+                   if(matches==0){ ///  if they match then the target of the packet is something we can reach somehow  ///
+                     here = 0;
+                     if(strcmp(tableInfo[k].ip, "-") != 0){  /// if the ip is NOT a dash then it is somthing we have to go trough router two to get to. ///
+                       /// sets the tableip to that ip for s new dest in ou rarp packet ///
+                       tableIP = inet_addr(tableInfo[k].ip);
+                       strcpy(name, tableInfo[k].name);
+                     }
+                     else{ ///  the ip didnt match the other routers IP so that means it on the current routers side of the system so the next dst is the actual dstination of the packet///
+                       tableIP = fromPacket;
+                       strcpy(name, tableInfo[k].name);
+                     }
+                   }
+                 }
+                 if(here == 1){
+                     /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
+                     icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 2);
+                     send(i, buf, 98, 0);
+                 }
 
-              /// we have to store the message, cant just send it becasue the router doesnt know the mac of the next hop of the packet so we need to store it and then send and arp ///
-              int m;
-              for(m = 0 ; m < 100; m++){ ///  check the whole array of message structures for an empty or overwritable structure   ///
-                if(storedMessage[m].valid == 0){ ///  if its zero then the structure at this spot is valid to be overwritten  ///
-    	            memcpy(storedMessage[m].buff, buf, 1500);
-                  storedMessage[m].valid = 1;
-                  storedMessage[m].waitingfor = tableIP;
-                  genTime(storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
-                  int p;
-                  for(p =0; p < numInterfaces; p++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
-                    if(strcmp(name, interfaces[p].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
-                      storedMessage[m].socketTO = interfaces[p].socket;
-                    }
-                  break;
-                }
-              }
-              char buffer[1500];
-              int x;
-              int foundSocket;
-              for(x =0; x < numInterfaces; x++){ ///  loop through sockets to find the one to send the arp request on  ///
-                if(strcmp(name, interfaces[x].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
-                  foundSocket = interfaces[x].socket;
-                  arpPacketReq(buffer, tableIP, name, interfaces);
-                  send(foundSocket, buffer, 42, 0);
-                  printf("Sent the ARP request for the packet destined for something other than the current router\n" );
-                }
-              }
+                 /// we have to store the message, cant just send it becasue the router doesnt know the mac of the next hop of the packet so we need to store it and then send and arp ///
+                 int m;
+                 for(m = 0 ; m < 100; m++){ ///  check the whole array of message structures for an empty or overwritable structure   ///
+                   if(storedMessage[m].valid == 0){ ///  if its zero then the structure at this spot is valid to be overwritten  ///
+                       memcpy(storedMessage[m].buff, buf, 1500);
+                     storedMessage[m].valid = 1;
+                     storedMessage[m].waitingfor = tableIP;
+                     genTime(storedMessage[m].timeMS);/// address arp is being sent to that the message needs to wait for a response from  ///
+                     int p;
+                     for(p =0; p < numInterfaces; p++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
+                       if(strcmp(name, interfaces[p].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
+                         storedMessage[m].socketTO = interfaces[p].socket;
+                       }
+                     break;
+                   }
+                 }
+                 char buffer[1500];
+                 int x;
+                 int foundSocket;
+                 for(x =0; x < numInterfaces; x++){ ///  loop through sockets to find the one to send the arp request on  ///
+                   if(strcmp(name, interfaces[x].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
+                     foundSocket = interfaces[x].socket;
+                     arpPacketReq(buffer, tableIP, name, interfaces);
+                     send(foundSocket, buffer, 42, 0);
+                     printf("Sent the ARP request for the packet destined for something other than the current router\n" );
+                   }
+                 }
+               }
+             }
+           }
+            else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
+             icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 1);
+             send(i, buf, 98, 0);
             }
           }
-        }
-        else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
-          icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 1);
-          send(i, buf, 98, 0);
         }
       }
     }
   }
- }
   freeifaddrs(ifaddr);
   return 0;
 }
