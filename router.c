@@ -146,7 +146,7 @@ int main(){
 
         struct timeval tv;
         gettimeofday(&tv, NULL); ///current time in miliseconds
-        long int now = (tv.tv_sec*1000)
+        long int now = (tv.tv_sec*1000);
         int k;
         struct iphdr ipReq;
         struct iphdr ipResp;
