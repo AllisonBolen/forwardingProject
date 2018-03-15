@@ -152,7 +152,7 @@ int main(){
         printf("this is a thing");
         //printf("\nNow: %ld",now);
         for(k = 0; k < sizeof(storedMessage); k++){
-        printf("here")
+        printf("here");
           if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
             memcpy(&eth, &pck[0], 14);
