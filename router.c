@@ -139,6 +139,7 @@ int main(){
       struct timeval tv = {100, 0};
       int timeout = select(FD_SETSIZE,&tmp_set, NULL, NULL, &tv);
       if(timeout == 0){
+        printf("TIMEOUT");
         // send the thing i need it to send // didnt get to the host we wanted
         // check the message array for the time in each one and then delecte the ones that have been sitting for a while
         // for every packet we delete then send an error for each one send it on the path it came on
@@ -147,7 +148,7 @@ int main(){
         struct iphdr ipReq;
         struct iphdr ipResp;
         struct ether_header ethResp, eth;
-
+        printf("\nNow: %d, Stored: %d",now,storedMessage[k].timeMS);
         for(k = 0; k < sizeof(storedMessage); k++){
           if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
