@@ -36,7 +36,7 @@ struct message{
   char buff[1500];
   int valid;
   in_addr_t waitingfor;
-  int timeMS;
+  long int timeMS;
   int socketTO; /// socket to send on for timeout ///
   /// evertime you store a packet sßtore a time stamp, every so often check the tiem statmp and if their old invalidate tehm and send an error mesage about it.
   /// how long before we go and check, sleact has a time out se t it to 100ms if selesct has a time out check you list because you got
@@ -144,13 +144,15 @@ int main(){
         // check the message array for the time in each one and then delecte the ones that have been sitting for a while
         // for every packet we delete then send an error for each one send it on the path it came on
 
-        int now = (int)time(NULL)*1000; ///current time in miliseconds
+        struct timeval tv;
+        gettimeofday(&tv, NULL); ///current time in miliseconds
+        long int now = (tv.tv_sec*1000)
         int k;
         struct iphdr ipReq;
         struct iphdr ipResp;
         struct ether_header ethResp, eth;
         printf("this is a thing");
-        printf("\nNow: %d",now);
+        printf("\nNow: %ld",now);
         for(k = 0; k < sizeof(storedMessage); k++){
           if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
@@ -308,7 +310,9 @@ int main(){
                        memcpy(storedMessage[m].buff, buf, 1500);
                      storedMessage[m].valid = 1;
                      storedMessage[m].waitingfor = tableIP; /// address arp is being sent to that the message needs to wait for a response from  ///
-                     storedMessage[m].timeMS= (int)time(NULL); /// timeout trash limit
+                     struct timeval tv;
+                     gettimeofday(&tv, NULL);
+                     storedMessage[m].timeMS= (tv.tv_sec * 1000); /// timeout trash limit
                      int p;
                      for(p =0; p < numInterfaces; p++){ ///  loop through sockets to find the one to store for the icmp error thing on timeout  ///
                        if(strcmp(name, interfaces[p].name)==0){ ///  if the name of the table ip we found mathches the name of the interface we are at then thats the socket we want  ///
