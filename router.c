@@ -153,14 +153,14 @@ int main(){
         //printf("\nNow: %ld",now);
         for(k = 0; k < sizeof(storedMessage); k++){
         printf("here");
-          if((now - storedMessage[k].timeMS) > 200){
+          //if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
             memcpy(&eth, &pck[0], 14);
             memcpy(&ipReq, &pck[14], sizeof(struct iphdr));
             icmpPacketERROR(interfaces, eth, ipReq, eth, ipReq, pck, 2);
             send(storedMessage[k].socketTO, pck, 98, 0);
             storedMessage[k].valid = 0;time_t seconds;
-          }
+          //}
         }
       }
       int i;
