@@ -150,7 +150,7 @@ int main(){
         struct iphdr ipResp;
         struct ether_header ethResp, eth;
         printf("this is a thing");
-        printf("\nNow: %d, Stored: %d",now,storedMessage[k].timeMS);
+        printf("\nNow: %d",now);
         for(k = 0; k < sizeof(storedMessage); k++){
           if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
