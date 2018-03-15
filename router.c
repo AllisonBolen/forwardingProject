@@ -329,11 +329,11 @@ int main(){
                }
              }
            }
-            else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
-             printf("TTL too low");
-             icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 1);
-             send(i, buf, 98, 0);
-            }
+          }
+          else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
+            printf("TTL too low");
+            icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 1);
+            send(i, buf, 98, 0);
           }
         }
       }
