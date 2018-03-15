@@ -54,6 +54,7 @@ void readFiles(char* filename, struct table tableInfo[4]);
 void icmpPacket(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf);
 ///  sends the ICMP ERROR packet if the router is being pinged  ///
 void icmpPacketERROR(struct interface interfaces[], struct ether_header eh, struct iphdr ipReq, struct ether_header ethResp, struct iphdr ipResp, char *buf, int error);
+
 ///  the number of interfaces we are connected to at the moment   ///
 int numInterfaces = 0;
 ///  the numebr of prefix inforamtion we need to hold  ///
@@ -150,17 +151,16 @@ int main(){
         struct iphdr ipResp;
         struct ether_header ethResp, eth;
         printf("this is a thing");
-        //printf("\nNow: %ld",now);
+        printf("\nNow: %ld",now);
         for(k = 0; k < sizeof(storedMessage); k++){
-        printf("here");
-          //if((now - storedMessage[k].timeMS) > 200){
+          if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
             memcpy(&eth, &pck[0], 14);
             memcpy(&ipReq, &pck[14], sizeof(struct iphdr));
             icmpPacketERROR(interfaces, eth, ipReq, eth, ipReq, pck, 2);
             send(storedMessage[k].socketTO, pck, 98, 0);
             storedMessage[k].valid = 0;time_t seconds;
-          //}
+          }
         }
       }
       int i;
