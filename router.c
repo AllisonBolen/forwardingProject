@@ -294,7 +294,7 @@ int main(){
                  }
                  if(here == 1){
                      /// the network didnt mathc anything we hold in teh table so send and error packet back out the same socket
-                     print("didnt match the table: network not found")
+                     print("didnt match the table: network not found");
                      icmpPacketERROR(interfaces, eh, ipReq, ethResp, ipResp, buf, 3);
                      send(i, buf, 98, 0);
                  }
