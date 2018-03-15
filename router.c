@@ -36,7 +36,7 @@ struct message{
   char buff[1500];
   int valid;
   in_addr_t waitingfor;
-  long timeMS;
+  int timeMS;
   int socketTO; /// socket to send on for timeout ///
   /// evertime you store a packet sßtore a time stamp, every so often check the tiem statmp and if their old invalidate tehm and send an error mesage about it.
   /// how long before we go and check, sleact has a time out se t it to 100ms if selesct has a time out check you list because you got
