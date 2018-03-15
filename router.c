@@ -232,7 +232,7 @@ int main(){
             memcpy(&hold, &ipReq, sizeof(ipReq));
             int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
             __u16 sumcheck = cksum(hold, wordnum);
-            if(memcmp(&sumcheck, &ipReq.check, sizeof(ipReq.check)) == 0){
+            //if(memcmp(&sumcheck, &ipReq.check, sizeof(ipReq.check)) == 0){
              /// if the cecksum and sumcheck match continue as normal ///
              int n;
              int forus = 0; /// boolean for telling us if teh packet was meant for the current router or not. ///
@@ -328,7 +328,7 @@ int main(){
                  }
                }
              }
-           }
+           //}
           }
           else{// make it out of the ip digits less then one on the ttl then you should send an error packet back
             printf("TTL too low");
