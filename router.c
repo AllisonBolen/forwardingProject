@@ -142,7 +142,7 @@ int main(){
         // send the thing i need it to send // didnt get to the host we wanted
         // check the message array for the time in each one and then delecte the ones that have been sitting for a while
         // for every packet we delete then send an error for each one send it on the path it came on
-        long now = gentime(now);
+        long now = genTime(now);
         int k;
         struct iphdr ipReq;
         struct iphdr ipResp;
