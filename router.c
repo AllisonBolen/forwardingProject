@@ -239,7 +239,7 @@ int main(){
              for(n =0;n < numInterfaces; n++){ /// check if its for me or not if its not for me we forward if ///
                if(memcmp(&ipReq.daddr, &interfaces[n].IP, 4) == 0){ /// if the ip the prequest is destined for is the current router respond to it ///
                  forus=1;
-                 printf("PACKET FOR THE ROUTER");
+                 printf("\nPACKET FOR THE ROUTER");
                  if((ipReq.protocol) == 1){ /// if the ip packet we just got is imcp
                    struct icmphdr icmpReq;
                    memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
