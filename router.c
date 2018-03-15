@@ -150,8 +150,9 @@ int main(){
         struct iphdr ipResp;
         struct ether_header ethResp, eth;
         printf("this is a thing");
-        printf("\nNow: %ld",now);
+        //printf("\nNow: %ld",now);
         for(k = 0; k < sizeof(storedMessage); k++){
+        printf("here")
           if((now - storedMessage[k].timeMS) > 200){
             char* pck = storedMessage[k].buff;
             memcpy(&eth, &pck[0], 14);
