@@ -236,7 +236,7 @@ int main(){
             memcpy(&hold, &ipReq, sizeof(ipReq));
             int wordnum = sizeof(ipReq)/2; /// how many 2 bytes are there in this thing because one 16bitword for every 2 bytes ///
             __u16 sumcheck = cksum(hold, wordnum);
-            if(memcmp(&sumcheck, &ipReq.check, sizeof(ipReq.check)) == 0){
+            if(sumcheck == 0){
              /// if the cecksum and sumcheck match continue as normal ///
              int n;
              int forus = 0; /// boolean for telling us if teh packet was meant for the current router or not. ///
@@ -249,7 +249,7 @@ int main(){
                    memcpy(&icmpReq, &buf[(sizeof(struct ether_header) + sizeof(struct iphdr))], sizeof(struct icmphdr));// get the icmp header
                    // __u8 sumcheck = cksum(icmpReq, sizeof(ipReq));
                    // if(memcmp(&sumcheck, &icmpReq) == 0){ ///  icmp checksum sumcheck matches  ///
-                     if(icmpReq.type == 8){ /// got an ICMP packet request for the current router send an ICMP reply packet back
+                     if(icmpReq.type == 8){ /// got an ICfMP packet request for the current router send an ICMP reply packet back
                        // got an ICMP request packet
                        printf("%s\n", "Received ICMP Request Packet");
                        icmpPacket(interfaces, eh, ipReq, ethResp, ipResp, buf);
